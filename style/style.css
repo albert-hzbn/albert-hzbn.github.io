@@ -1,0 +1,128 @@
+.education {
+    color: rgb(8, 8, 8);
+    width: 100%;
+    background-color: #f0f0f0;
+    margin: 0.1%;
+    padding: 1%;
+}
+
+.education-block {
+    background-color: #dbdbdb;
+    padding: 2% 1% 1% 1%;
+}
+
+.my_photo {
+    float: left;
+    border-radius: 5%;
+    border-color: red;
+    background-color: red;
+}
+
+.aboutme-card {
+    background-color: #002422;
+    color: white;
+    padding: 5%;
+    margin-bottom: 1%;
+    border-radius: 0%;
+    border-color: black;
+    border-style: solid;
+    border-width: 1px;
+}
+
+.aboutme-content {
+    font-size: 20px;
+    text-align: justify;
+}
+
+.type {
+    font-size: 35px;
+    background-color: rgb(0, 35, 49);
+    padding: 2%;
+    color: white;
+}
+
+.research-papers {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.paper {
+    border-radius: 1%;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    padding: 4%;
+    align-items: center;
+    background-color: rgb(180, 223, 252);
+}
+
+.img-paper {
+    align-items: center;
+    width: 100%;
+    align-items: center;
+}
+
+.citation-paper {
+    padding: 5px;
+    margin-top: 10px;
+}
+
+.footer {
+    margin-top: 50px;
+    padding: 20px;
+    height: 100px;
+    background-color: rgb(0, 25, 94);
+    color: white;
+}
+
+
+.fa-brands {
+    width: 50px;
+    height: 50px;
+    background-color: rgb(7, 39, 128);
+    padding: 10px;
+    border-radius: 4px;
+    border-color: black;
+    border-width: 5px;
+    color: rgb(255 255 255);
+    font-size: 30px;
+    margin-left: 10px;
+    margin-right: 10px;
+    transition: 0.3s;
+}
+
+.fa-brands:hover {
+    background-color: rgb(0, 0, 0);
+}
+
+.file-name {
+    font-size: x-large;
+    color: #a30000;
+    text-align: center;
+}
+
+.structure-info {
+    width: 400px;
+    height: 600px;
+}
+
+.navbar-brand {
+    font-size: 30px;
+}
+
+.navbar {
+    padding: 1%;
+    background-color: #b9ecff !important;
+}
+
+.nav-item {
+    padding: 5px;
+    background-color: #ffffff;
+    border-width: 1px;
+    color: black;
+    border-radius: 2px;
+}
+
+.nav-link:hover {
+    background-color: blue;
+    color: white;
+}
