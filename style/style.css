@@ -70,8 +70,8 @@
 .footer {
     text-align: center;
     margin-top: 50px;
-    padding: 20px;
-    height: 100px;
+    padding: 60px;
+    height: 200px;
     background-color: rgb(0, 25, 94);
     color: white;
 }
@@ -135,3 +135,101 @@
     color: white;
     transition: 0.1;
 }
+
+
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+}
+
+canvas {
+    border: 1px solid #000;
+}
+
+.controls-container {
+    width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+input[type="range"] {
+    width: 100%;
+}
+
+.button-container {
+    display: flex;
+    gap: 10px;
+}
+
+button {
+    padding: 8px 16px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+.parameters-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    width: 600px;
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin: 10px;
+}
+
+.parameter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+label {
+    font-weight: bold;
+}
+
+input[type="number"] {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 150px;
+}
+
+.animation-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.column {
+    float: left;
+    width: 50%;
+}
+
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.timeStep {
+    float: right;
+}
+
+.footer > .container {
+    width: 20%;
+} 

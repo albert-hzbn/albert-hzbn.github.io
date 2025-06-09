@@ -33,15 +33,26 @@
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="sqs_to_poscar.html">SQS to POSCAR</a></li>
-
                         </ul>
                     </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            Phase-Field
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="grain_growth.html">Isotrpic Grain Growth</a>
+                            </li>
+                            <li><a class="dropdown-item" href="spinodal.html">Spinodal Decomposition</a>
+                            </li>
+                        </ul>
+                    </li>
+
                 </ul>
 
             </div>
         </div>
     </nav>
-
     <div class="container about-sqsToPoscar">
         <p>
             The Special Quasirandom Structure (SQS) technique allows us to model the
@@ -237,25 +248,29 @@
             </div>
             <div class="col-md-5">
                 <div class="file-name form-label">POSCAR</div>
-                <textarea class="form-control structure-info" id="poscar" placeholder="'POSCAR' file will appear here"></textarea>
+                <textarea class="form-control structure-info" id="poscar"
+                    placeholder="'POSCAR' file will appear here"></textarea>
             </div>
         </div>
     </div>
 
+
     <footer class="footer">
         <div class="container">
-                <a href="https://www.facebook.com/albert.hzbn/" target="_blank">
+            <div class="row">
+                <a href="https://www.facebook.com/albert.hzbn/" target="_blank" class="col-sm">
                     <i class="fa-brands fa-facebook-f"></i>
                 </a>
-                <a href="https://github.com/albert-hzbn" target="_blank">
+                <a href="https://github.com/albert-hzbn" target="_blank" class="col-sm">
                     <i class="fa-brands fa-github"></i>
                 </a>
-                <a href="https://www.researchgate.net/profile/Albert-Linda" target="_blank">
+                <a href="https://www.researchgate.net/profile/Albert-Linda" target="_blank" class="col-sm">
                     <i class="fa-brands fa-researchgate"></i>
                 </a>
+            </div>
         </div>
     </footer>
-    <script src="./dist/sqs_to_poscar.js"></script>
+    <script src="dist/sqs_to_poscar.js"></script>
 </body>
 
 </html>

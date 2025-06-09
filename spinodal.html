@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style/style.css">
+
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="index.html">Albert Linda</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="work.html">Work</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            Tools
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="sqs_to_poscar.html">SQS to POSCAR</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            Phase-Field
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="grain_growth.html">Isotrpic Grain Growth</a>
+                            </li>
+                            <li><a class="dropdown-item" href="spinodal.html">Spinodal Decomposition</a>
+                            </li>
+                        </ul>
+                    </li>
+
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="row">
+            <div class="column">
+                <canvas id="gridCanvas" width="400" height="400"></canvas>
+
+                <div class="animation-control">
+                    <label for="frameDelay">Animation Delay (ms):</label>
+                    <input type="number" id="frameDelay" value="50" min="50" step="50">
+                </div>
+                <input type="range" id="timeSlider" min="0" value="0" step="1">
+                <div class="column">
+                    <div class="button-container">
+                        <button id="playButton">Play</button>
+                        <button id="resetButton">Reset</button>
+                    </div>
+                </div>
+
+                <div id="timeStep">Time Step: 0</div>
+            </div>
+            <div class="column">
+                <div class="parameters-container">
+                    <div class="parameter-group">
+                        <label for="Nx">Grid Size X (Nx)</label>
+                        <input type="number" id="Nx" value="100" step="1">
+                    </div>
+                    <div class="parameter-group">
+                        <label for="Ny">Grid Size Y (Ny)</label>
+                        <input type="number" id="Ny" value="100" step="1">
+                    </div>
+                    <div class="parameter-group">
+                        <label for="dx">dx</label>
+                        <input type="number" id="dx" value="1.0" step="0.1">
+                    </div>
+                    <div class="parameter-group">
+                        <label for="dy">dy</label>
+                        <input type="number" id="dy" value="1.0" step="0.1">
+                    </div>
+                    <div class="parameter-group">
+                        <label for="M">Mobility (M)</label>
+                        <input type="number" id="M" value="1.0" step="0.1">
+                    </div>
+                    <div class="parameter-group">
+                        <label for="epsilon">Epsilon</label>
+                        <input type="number" id="epsilon" value="1.0" step="0.1">
+                    </div>
+                    <div class="parameter-group">
+                        <label for="aVal">Gibbs energy cofficient</label>
+                        <input type="number" id="aVal" value="1.0" step="0.1">
+                    </div>
+                    <div class="parameter-group">
+                        <label for="avgComp">Average Composition</label>
+                        <input type="number" id="avgComp" value="0.3" step="0.1">
+                    </div>
+                    <div class="parameter-group">
+                        <label for="fluctuation">Fluctuation</label>
+                        <input type="number" id="fluctuation" value="0.001" step="0.001">
+                    </div>
+                    <div class="parameter-group">
+                        <label for="kappa">Kappa</label>
+                        <input type="number" id="kappa" value="1.0" step="0.1">
+                    </div>
+                    <div class="parameter-group">
+                        <label for="dt">dt</label>
+                        <input type="number" id="dt" value="0.01" step="0.1">
+                    </div>
+                    <div class="parameter-group">
+                        <label for="tEnd">End Time</label>
+                        <input type="number" id="tEnd" value="1000.0" step="1.0">
+                    </div>
+                    <div class="parameter-group">
+                        <label for="outInterval">Output Interval</label>
+                        <input type="number" id="outInterval" value="100.0" step="0.1">
+                    </div>
+                    <button id="startCalculation">Start Calculation</button>
+                    <div>Status: <span id="status">N/A</span></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="spinodal.js"></script>
+    <script src="visualize.js"></script>
+    <script>
+        simulation_type = "spinodal"
+        params_list = ["Nx", "Ny", "dx", "dy", "M", "epsilon", "aVal", "avgComp", "fluctuation", "kappa", "dt", "tEnd", "outInterval"]
+        document.getElementById('startCalculation').addEventListener('click', function () {
+            const data = params_list.reduce((obj, id) => {
+                obj[id] = parseFloat(document.getElementById(id).value);
+                return obj;
+            }, {});
+            console.log(data);  // Use the data here
+            startCalculations(simulation_type, data);
+        });
+    </script>
+    <script src="assets/js/bootstrap.bundle.js"></script>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <a href="https://www.facebook.com/albert.hzbn/" target="_blank" class="col-sm">
+                    <i class="fa-brands fa-facebook-f"></i>
+                </a>
+                <a href="https://github.com/albert-hzbn" target="_blank" class="col-sm">
+                    <i class="fa-brands fa-github"></i>
+                </a>
+                <a href="https://www.researchgate.net/profile/Albert-Linda" target="_blank" class="col-sm">
+                    <i class="fa-brands fa-researchgate"></i>
+                </a>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>
