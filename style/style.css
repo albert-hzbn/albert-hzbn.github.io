@@ -33,7 +33,7 @@
 
 .type {
     font-size: 35px;
-    background-color: rgb(0 37 112);
+    background-color:rgb(40 126 138);
     padding: 2%;
     color: white;
 }
@@ -68,7 +68,7 @@
     margin-top: 50px;
     padding: 60px;
     height: 200px;
-    background-color: rgb(0, 25, 94);
+    background-color: rgb(25 55 64);
     color: white;
 }
 
@@ -76,7 +76,7 @@
 .fa-brands {
     width: 75px;
     height: 75px;
-    background-color: rgb(0 50 189);
+    background-color: rgb(40 126 138);
     padding: 10px;
     border-radius: 4px;
     border-color: black;
@@ -110,7 +110,7 @@
 
 .navbar {
     padding: 1%;
-    background-color: #000599 !important;
+    background-color: #204e5a !important;
 }
 
 .nav-item {
@@ -141,6 +141,7 @@
 }
 
 canvas {
+    background-color: white;
     border: 1px solid #000;
 }
 
@@ -165,17 +166,18 @@ button {
     padding: 8px 16px;
     font-size: 16px;
     cursor: pointer;
-    background-color: #4CAF50;
+    background-color: #4e4e4e;
     color: white;
     border: none;
     border-radius: 4px;
 }
 
 button:hover {
-    background-color: #45a049;
+    background-color: rgb(25 55 64);
 }
 
 .parameters-container {
+    background-color: #f7f7f7;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
@@ -332,3 +334,4 @@ input[type="number"] {
     border: 1px solid #ccc;
     background-color: #f9f9f9;
 }
+
