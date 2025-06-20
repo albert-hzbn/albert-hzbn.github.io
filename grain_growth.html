@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <link rel="stylesheet" href="style/style.css">
 
 </head>
@@ -33,6 +33,7 @@
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="sqs_to_poscar.html">SQS to POSCAR</a></li>
+                            <li><a class="dropdown-item" href="loader.html">Atomic Structure Loader</a></li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
@@ -112,7 +113,7 @@
                     </div>
                     <div class="parameter-group">
                         <label for="tEnd">End Time</label>
-                        <input type="number" id="tEnd" value="1000.0" step="1.0">
+                        <input type="number" id="tEnd" value="500.0" step="1.0">
                     </div>
                     <button id="startCalculation">Start Calculation</button>
                     <div>Status: <span id="status">N/A</span></div>
@@ -122,8 +123,8 @@
         </div>
     </div>
 
-    <script src="pf_codes/grain_growth.js"></script>
-    <script src="pf_codes/visualize.js"></script>
+    <script src="dist/phase_field/grain_growth.js"></script>
+    <script src="dist/phase_field/visualize.js"></script>
     <script>
         simulation_type = "grain_growth"
         params_list = ["Nx", "Ny", "dx", "dy", "ngrains", "dt", "kappa", "L", "tEnd", "outInterval"]
@@ -142,8 +143,11 @@
     <footer class="footer">
         <div class="container">
             <div class="row">
-                <a href="https://www.facebook.com/albert.hzbn/" target="_blank" class="col-sm">
-                    <i class="fa-brands fa-facebook-f"></i>
+                <a href="https://scholar.google.com/citations?user=o7FBjEcAAAAJ&hl=en" target="_blank" class="col-sm">
+                    <i class="fa-brands fa-google-scholar"></i>
+                </a>
+                <a href="https://www.linkedin.com/in/albert-hzbn/" target="_blank" class="col-sm">
+                    <i class="fa-brands fa-linkedin"></i>
                 </a>
                 <a href="https://github.com/albert-hzbn" target="_blank" class="col-sm">
                     <i class="fa-brands fa-github"></i>

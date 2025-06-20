@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Visualize Atoms</title>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.161/build/three.module.js",
+        "jsm/": "https://cdn.jsdelivr.net/npm/three@0.161/examples/jsm/"
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="style/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <canvas id="webgl-canvas"></canvas>
+    <div id="ui-panel">
+      <div id="atom-info">Atom info will appear here</div>
+      <button class="collapsible">File</button>
+      <div class="content">
+        <div>Load File(*.xyz, POSCAR, LAMMPS dump)</div>
+        <input type="file" id="fileInput" accept="" />
+      </div>
+
+      <button class="collapsible">Transform Atoms</button>
+      <div class="content">
+        <div class="grid">
+          <input type="number" id="a1" , value="1">
+          <input type="number" id="b1" , value="0">
+          <input type="number" id="c1" , value="0">
+          <input type="number" id="a2" , value="0">
+          <input type="number" id="b2" , value="1">
+          <input type="number" id="c2" , value="0">
+          <input type="number" id="a3" , value="0">
+          <input type="number" id="b3" , value="0">
+          <input type="number" id="c3" , value="1">
+        </div>
+        <button onclick="transformStructure()">Transform</button>
+      </div>
+      <button class="collapsible">Measurement</button>
+      <div class="content">
+        <div class="bond-distance">
+          <button id="bond-length-btn" onclick="measureBondLength()">Bond Distance</button>
+          <button onclick="clearBondLengthInfo()">Clear</button>
+          <div id="bond-length-info">N/A</div>
+        </div>
+        <div class="bond-angle">
+          <button id="bond-angle-btn" onclick="measureBondAngle()">Bond Angle</button>
+          <button onclick="clearBondAngleInfo()">Clear</button>
+          <div id="bond-angle-info">N/A</div>
+        </div>
+      </div>
+
+
+
+      <button class="collapsible">About</button>
+      <div class="content">
+        <div class="about-container">
+          <p>
+            A simple atomic visualizer that allows you to view <code>*.xyz</code>, <code>POSCAR</code>, and
+            <code>LAMMPS dump</code> files directly in your browser.
+            To get started, click on <strong>File &gt; Choose File</strong> to load a structure. You can view atomic
+            positions in Cartesian coordinates by hovering over individual atoms.
+          </p>
+
+          <p>
+            Once a structure is loaded, you can:
+          <ul>
+            <li>Create a supercell from the original structure</li>
+            <li>Measure bond distances and bond angles</li>
+          </ul>
+          Additional features will be added in future updates.
+          </p>
+
+          <h4>Structure Visualization</h4>
+          <p>
+            Click and drag to rotate the structure. Use mouse scroll to rotate to zoom in and out. Right click and drag
+            to move the structure.
+          </p>
+
+          <h4>Transform Atoms</h4>
+          <p>
+            Click on <strong>Transform Atoms</strong> in the right panel. Enter the transformation matrix and then click
+            <strong>Transform</strong> to apply it to the structure.
+          </p>
+
+          <h4>Bond Distance Measurement</h4>
+          <p>
+            Go to <strong>Measurement &gt; Bond Distance</strong>. Click on the first atom, then the second atom—the
+            distance between them will be displayed.
+            Click <strong>Clear</strong> to perform a new measurement.
+          </p>
+
+          <h4>Bond Angle Measurement</h4>
+          <p>
+            Go to <strong>Measurement &gt; Bond Angle</strong>. Click on three atoms in order: first, second, and third.
+            The bond angle formed at the second atom (between the first and third) will be shown.
+            Click <strong>Clear</strong> to measure another angle.
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  </div>
+  <script src="dist/structure_loader/ui.js"></script>
+  <script type="module" src="dist/structure_loader/index.js"></script>
+</body>
+
+</html>

@@ -30,7 +30,10 @@ let simulationResults;
 async function startCalculations(simulation_type, simulationParams) {
   console.log(simulationParams);
   console.log("Started");
-  document.getElementById("status").textContent = "Running...";
+  let statusElement = document.getElementById("status");
+  statusElement.textContent = "Running...";
+  statusElement.style.color = "red";
+
   await new Promise((resolve) => setTimeout(resolve, 1000)); // Pause for 1 second
   console.log("now running");
 
@@ -43,7 +46,9 @@ async function startCalculations(simulation_type, simulationParams) {
     simulationResults = simulation.runSimulation();
   }
 
-  document.getElementById("status").textContent = "Completed";
+  statusElement = document.getElementById("status");
+  statusElement.textContent = "Completed";
+  statusElement.style.color = "green";
   // console.log(simulationResults);
 
   // Set up slider and draw initial grid
@@ -77,15 +82,15 @@ function drawGrid(data, timeStep) {
   const values2D = currentData.data;
 
   // Flatten the 2D array to compute min and max
-  const flatValues = values2D.flat();  // or use .reduce if .flat isn't available
+  const flatValues = values2D.flat(); // or use .reduce if .flat isn't available
   const min = Math.min(...flatValues);
   const max = Math.max(...flatValues);
 
   // Normalize each value in the 2D array
-  const normalizedData = (max === min)
-    ? values2D.map(row => row.map(_ => 0.5))  // or 0 or 1, based on your preference
-    : values2D.map(row => row.map(value => (value - min) / (max - min)));
-
+  const normalizedData =
+    max === min
+      ? values2D.map((row) => row.map((_) => 0.5)) // or 0 or 1, based on your preference
+      : values2D.map((row) => row.map((value) => (value - min) / (max - min)));
 
   // Draw cells
   for (let x = 0; x < size_x; x++) {
@@ -95,7 +100,7 @@ function drawGrid(data, timeStep) {
       ctx.fillRect(x * cellWidth, y * cellHeight, cellWidth, cellHeight);
     }
   }
-  console.log(currentData.data,normalizedData);
+  console.log(currentData.data, normalizedData);
 
   // Grid lines
   ctx.strokeStyle = "#000000";

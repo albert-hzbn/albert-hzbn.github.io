@@ -20,14 +20,10 @@
 
 
 .aboutme-card {
-    background-color: #dfdfdf;
+    background-color: #ffffff;
     color: black;
     padding: 5%;
     margin-bottom: 1%;
-    border-radius: 0%;
-    border-color: black;
-    border-style: solid;
-    border-width: 1px;
 }
 
 .aboutme-content {
@@ -37,7 +33,7 @@
 
 .type {
     font-size: 35px;
-    background-color: rgb(1, 88, 122);
+    background-color: rgb(0 37 112);
     padding: 2%;
     color: white;
 }
@@ -78,15 +74,15 @@
 
 
 .fa-brands {
-    width: 50px;
-    height: 50px;
+    width: 75px;
+    height: 75px;
     background-color: rgb(0 50 189);
     padding: 10px;
     border-radius: 4px;
     border-color: black;
     border-width: 5px;
     color: rgb(255 255 255);
-    font-size: 30px;
+    font-size: 60px;
     margin-left: 10px;
     margin-right: 10px;
     transition: 0.3s;
@@ -114,7 +110,7 @@
 
 .navbar {
     padding: 1%;
-    background-color: #033d52 !important;
+    background-color: #000599 !important;
 }
 
 .nav-item {
@@ -230,6 +226,109 @@ input[type="number"] {
     float: right;
 }
 
-.footer > .container {
-    width: 20%;
-} 
+.footer>.container {
+    width: 38%;
+}
+
+
+
+#container {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+}
+
+#webgl-canvas {
+    background: #ffffff;
+    display: block;
+    width: 80%;
+    height: 100%;
+}
+
+#ui-panel {
+    padding: 0px;
+    background-color: #f4f4f4;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+
+#atom-info {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 10px 14px;
+    font-family: monospace;
+    display: none;
+    border-radius: 5px;
+    pointer-events: none;
+    min-width: 120px;
+    text-align: left;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    max-width: 300px;
+    margin: 20px auto;
+}
+
+.grid input[type="number"] {
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid #999;
+    border-radius: 2px;
+    background-color: #fdfdfd;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+
+#fileInput {
+    padding: 8px;
+}
+
+
+.collapsible {
+    background-color: #3498db;
+    color: white;
+    cursor: pointer;
+    padding: 1rem;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 1rem;
+    border-radius: 2px;
+    transition: background-color 0.3s;
+}
+
+.collapsible:hover {
+    background-color: #2980b9;
+}
+
+.content {
+    padding: 0 1rem;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-out;
+    background-color: #f1f1f1;
+    border-radius: 0 0 2px 2px;
+}
+
+.active+.content {
+    margin-top: 5px;
+}
+
+.about-container {
+    padding: 10px;
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 10px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+}
