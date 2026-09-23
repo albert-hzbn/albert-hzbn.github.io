@@ -5,76 +5,36 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>SQS → POSCAR converter · Albert Linda</title>
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <link rel="stylesheet" href="style/style.css">
-    <style>
-        body {
-            background-color:#e3e8e9;
-        }
-    </style>
+    <link rel="icon" href="resources/images/favicon.jpg">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
+    <link rel="stylesheet" href="style/site.css">
 
 </head>
 
-<body>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="index.html">Albert Linda</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
-                aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link" href="work.html">Work</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                            aria-expanded="false">
-                            Tools
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="sqs_to_poscar.html">SQS to POSCAR</a></li>
-                            <li><a class="dropdown-item" href="loader.html">Atomic Structure Loader</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                            aria-expanded="false">
-                            Phase-Field
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="grain_growth.html">Isotrpic Grain Growth</a>
-                            </li>
-                            <li><a class="dropdown-item" href="spinodal.html">Spinodal Decomposition</a>
-                            </li>
-                        </ul>
-                    </li>
-
-                </ul>
-
-            </div>
+<body class="tool-page">
+    <header class="site-header">
+        <div class="wrap">
+            <a class="site-brand" href="index.html">Albert Linda</a>
+            <nav class="site-nav">
+                <a href="index.html">About</a>
+                <a href="publications.html">Publications</a>
+                <a href="software.html" aria-current="page">Software</a>
+            </nav>
         </div>
-    </nav>
-    <div class="container about-sqsToPoscar">
-        <p>
-            The Special Quasirandom Structure (SQS) technique allows us to model the
-            disordered behavior of alloys. One tool that can be used for this purpose
-            is the Alloy Theoretic Automated Toolkit (ATAT), which generates an SQS file
-            named "besqsqs.out". In order to perform atomistic simulation, this file needs
-            to be converted into a readable format.
-        </p>
-        <p>
-            This small program can help with this task by converting the "besqsqs.out"
-            file generated from ATAT into the "POSCAR" file format, which can be used for
-            VASP calculations. To use this feature, simply copy and paste the "besqsqs.out"
-            file and click the "convert" button to generate the "POSCAR" file on the right.
-        </p>
+    </header>
+    <div class="wrap tool-intro">
+        <a href="software.html#web-tools">← Web tools</a>
+        <h1>SQS → POSCAR converter</h1>
+        <p>Special quasirandom structures (SQS) model the disorder of alloys in a small periodic cell. ATAT writes
+            them as <code>bestsqs.out</code>; paste that file on the left and click <strong>Convert</strong> to get a
+            VASP <code>POSCAR</code> on the right. Everything runs in your browser.</p>
     </div>
-    <div class="container">
+    <div class="container tool-body">
         <div class="row">
             <div class="col-md-5">
                 <div class="file-name form-label">bestsqs.out</div>
@@ -261,22 +221,15 @@
     </div>
 
 
-    <footer class="footer">
-        <div class="container">
-            <div class="row">
-                <a href="https://scholar.google.com/citations?user=o7FBjEcAAAAJ&hl=en" target="_blank" class="col-sm">
-                    <i class="fa-brands fa-google-scholar"></i>
-                </a>
-                <a href="https://www.linkedin.com/in/albert-hzbn/" target="_blank" class="col-sm">
-                    <i class="fa-brands fa-linkedin"></i>
-                </a>
-                <a href="https://github.com/albert-hzbn" target="_blank" class="col-sm">
-                    <i class="fa-brands fa-github"></i>
-                </a>
-                <a href="https://www.researchgate.net/profile/Albert-Linda" target="_blank" class="col-sm">
-                    <i class="fa-brands fa-researchgate"></i>
-                </a>
-            </div>
+    <footer class="site-footer">
+        <div class="wrap">
+            <span>Albert Linda · Düsseldorf</span>
+            <span>
+                <a href="https://scholar.google.com/citations?user=o7FBjEcAAAAJ&hl=en" target="_blank"
+                    rel="noopener">Scholar</a><a href="https://github.com/albert-hzbn" target="_blank"
+                    rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/albert-hzbn/" target="_blank"
+                    rel="noopener">LinkedIn</a>
+            </span>
         </div>
     </footer>
     <script src="dist/sqs_to_poscar.js"></script>

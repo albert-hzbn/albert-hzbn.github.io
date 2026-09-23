@@ -1,0 +1,1112 @@
+/* Site-wide styles. Tool pages also load style/style.css for their widgets,
+   so rules here are scoped to body.site / body.tool-page or use class names
+   that style.css does not. */
+
+:root {
+    --bg: #fdfdfb;
+    --text: #222;
+    --muted: #666;
+    --faint: #8a8a8a;
+    --rule: #e2e0da;
+    --link: #1a5e8a;
+    --link-hover: #0d3d5c;
+    --band: #f3f1ea;
+    --frame: #ffffff;
+    --grain-dark: 0;
+    --measure: 760px;
+    --wide: 1040px;
+    --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+    --sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        --bg: #16181a;
+        --text: #e4e2dd;
+        --muted: #a3a09a;
+        --faint: #85827c;
+        --rule: #2f3133;
+        --link: #8cc1e6;
+        --link-hover: #b9dbf2;
+        --band: #1c1f22;
+        --frame: #e9ecee;
+        --grain-dark: 1;
+    }
+}
+
+:root[data-theme="dark"] {
+    --bg: #16181a;
+    --text: #e4e2dd;
+    --muted: #a3a09a;
+    --faint: #85827c;
+    --rule: #2f3133;
+    --link: #8cc1e6;
+    --link-hover: #b9dbf2;
+    --band: #1c1f22;
+    --frame: #e9ecee;
+    --grain-dark: 1;
+}
+
+/* ---------- Base ---------- */
+
+body.site {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--serif);
+    font-size: 18px;
+    line-height: 1.6;
+}
+
+body.site a {
+    color: var(--link);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+    text-decoration-color: color-mix(in srgb, var(--link) 35%, transparent);
+}
+
+body.site a:hover {
+    color: var(--link-hover);
+    text-decoration-color: currentColor;
+}
+
+body.site h1,
+body.site h2,
+body.site h3 {
+    font-weight: 600;
+    line-height: 1.25;
+    margin: 0;
+}
+
+body.site h2 {
+    font-size: 1.35rem;
+    margin: 48px 0 16px;
+}
+
+body.site p {
+    margin: 0 0 16px;
+}
+
+body.site code {
+    font-size: 0.85em;
+}
+
+.wrap {
+    max-width: var(--measure);
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+@media (max-width: 600px) {
+    body.site {
+        font-size: 17px;
+    }
+
+    .wrap {
+        padding: 0 16px;
+    }
+}
+
+/* ---------- Header ---------- */
+
+.site-header {
+    border-bottom: 1px solid var(--rule);
+    background: var(--bg);
+    font-family: var(--sans);
+}
+
+.site-header .wrap {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 4px 24px;
+    padding-top: 20px;
+    padding-bottom: 16px;
+}
+
+.site-brand {
+    font-family: var(--serif);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text) !important;
+    text-decoration: none !important;
+}
+
+.site-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    font-size: 0.93rem;
+}
+
+.site-nav a {
+    color: var(--muted) !important;
+    text-decoration: none !important;
+}
+
+.site-nav a:hover,
+.site-nav a[aria-current="page"] {
+    color: var(--text) !important;
+}
+
+.site-nav a[aria-current="page"] {
+    font-weight: 600;
+}
+
+/* ---------- Home ---------- */
+
+.intro {
+    padding-top: 40px;
+}
+
+.intro::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.intro h1 {
+    font-size: 2rem;
+    margin-bottom: 2px;
+}
+
+.intro .position {
+    color: var(--muted);
+    margin-bottom: 24px;
+}
+
+.portrait {
+    float: right;
+    width: 190px;
+    height: auto;
+    margin: 6px 0 16px 32px;
+    border-radius: 3px;
+}
+
+@media (max-width: 600px) {
+    .portrait {
+        float: none;
+        display: block;
+        width: 140px;
+        margin: 0 0 20px;
+    }
+}
+
+.contact {
+    font-family: var(--sans);
+    font-size: 0.9rem;
+    color: var(--faint);
+}
+
+.interests {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.interests li {
+    margin-bottom: 6px;
+}
+
+.see-all {
+    font-family: var(--sans);
+    font-size: 0.9rem;
+}
+
+/* ---------- Publication lists ---------- */
+
+.pubs {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.pubs li {
+    margin-bottom: 18px;
+}
+
+.pubs .title {
+    display: block;
+    font-weight: 600;
+}
+
+.pubs .authors,
+.pubs .venue {
+    display: block;
+    font-size: 0.95rem;
+}
+
+.pubs .authors {
+    color: var(--muted);
+}
+
+.pubs .me {
+    color: var(--text);
+    font-weight: 600;
+}
+
+.pubs .links {
+    font-family: var(--sans);
+    font-size: 0.8rem;
+    margin-left: 6px;
+}
+
+.pubs .links a {
+    margin-right: 8px;
+}
+
+.year-head {
+    font-family: var(--sans);
+    font-size: 0.9rem !important;
+    color: var(--faint);
+    margin: 36px 0 12px !important;
+}
+
+/* ---------- Software lists ---------- */
+
+.projects {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.projects li {
+    margin-bottom: 20px;
+}
+
+.projects .name {
+    font-weight: 600;
+}
+
+.projects .meta {
+    font-family: var(--sans);
+    font-size: 0.8rem;
+    color: var(--faint);
+    margin-left: 6px;
+}
+
+.projects p {
+    margin: 2px 0 0 !important;
+    font-size: 0.97rem;
+}
+
+/* ---------- Inner page title ---------- */
+
+.page-title {
+    font-size: 1.8rem;
+    margin: 40px 0 12px !important;
+}
+
+/* ---------- Footer ---------- */
+
+.site-footer {
+    margin-top: 72px;
+    border-top: 1px solid var(--rule);
+    padding: 20px 0 40px;
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    color: var(--faint);
+    background: var(--bg);
+}
+
+.site-footer .wrap {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+}
+
+.site-footer a {
+    color: var(--muted) !important;
+    text-decoration: none !important;
+}
+
+.site-footer a + a {
+    margin-left: 14px;
+}
+
+.site-footer a:hover {
+    color: var(--text) !important;
+}
+
+/* ---------- Tool pages ---------- */
+
+body.tool-page {
+    background: var(--bg) !important;
+    color: var(--text);
+}
+
+body.tool-page .wrap {
+    max-width: 1140px;
+}
+
+.tool-intro {
+    padding-top: 28px;
+    padding-bottom: 8px;
+}
+
+.tool-intro a {
+    font-family: var(--sans);
+    font-size: 0.88rem;
+    color: var(--link);
+    text-decoration: none;
+}
+
+.tool-intro h1 {
+    font-family: var(--serif);
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin: 8px 0;
+    color: var(--text);
+}
+
+.tool-intro p {
+    color: var(--muted);
+    max-width: 75ch;
+}
+
+.tool-body canvas {
+    max-width: 100%;
+    height: auto;
+}
+
+.tool-body .parameters-container,
+.tool-body .controls-container {
+    max-width: 100%;
+}
+
+body.tool-page .file-name {
+    color: var(--text);
+    font-size: 1.05rem;
+    font-weight: 600;
+    text-align: left;
+}
+
+body.tool-page .btn-primary {
+    background: var(--link);
+    border-color: var(--link);
+}
+
+body.tool-page .btn-primary:hover {
+    background: var(--link-hover);
+    border-color: var(--link-hover);
+}
+
+body.tool-page button:not(.btn) {
+    background-color: #3b4650;
+}
+
+@media (max-width: 820px) {
+    .tool-body .column {
+        float: none;
+        width: 100%;
+    }
+
+    .tool-body .parameters-container {
+        width: auto;
+    }
+}
+
+
+/* ==========================================================================
+   Homepage
+   ========================================================================== */
+
+.wide {
+    max-width: var(--wide);
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+@media (max-width: 600px) {
+    .wide {
+        padding: 0 16px;
+    }
+}
+
+/* ---------- Header band with live simulation ---------- */
+
+.masthead {
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid var(--rule);
+}
+
+#grain-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.masthead::before {
+    /* Fade the simulation out behind the text column. */
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(90deg, var(--bg) 0%, color-mix(in srgb, var(--bg) 92%, transparent) 42%,
+            color-mix(in srgb, var(--bg) 30%, transparent) 75%, transparent 100%);
+    pointer-events: none;
+}
+
+.masthead-inner {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 220px;
+    gap: 48px;
+    align-items: center;
+    padding-top: 64px;
+    padding-bottom: 64px;
+}
+
+.masthead h1 {
+    font-size: clamp(2.2rem, 4.6vw, 3.1rem) !important;
+    letter-spacing: -0.015em;
+    margin-bottom: 6px !important;
+}
+
+.masthead .position {
+    font-family: var(--sans);
+    font-size: 0.98rem;
+    color: var(--muted);
+    margin-bottom: 22px !important;
+}
+
+.masthead .summary {
+    font-size: 1.12rem;
+    max-width: 36em;
+}
+
+.masthead .portrait {
+    float: none;
+    width: 220px;
+    margin: 0;
+    border-radius: 4px;
+    border: 5px solid var(--frame);
+    box-shadow: 0 6px 24px rgb(0 0 0 / 12%);
+}
+
+.masthead .contact {
+    margin-top: 22px;
+    margin-bottom: 0 !important;
+}
+
+.sim-caption {
+    position: absolute;
+    right: 16px;
+    bottom: 10px;
+    z-index: 2;
+    font-family: var(--sans);
+    font-size: 0.72rem;
+    color: var(--muted);
+    background: color-mix(in srgb, var(--bg) 75%, transparent);
+    padding: 2px 8px;
+    border-radius: 3px;
+}
+
+@media (max-width: 760px) {
+    .masthead-inner {
+        grid-template-columns: 1fr;
+        gap: 24px;
+        padding-top: 36px;
+        padding-bottom: 48px;
+    }
+
+    .masthead .portrait {
+        width: 140px;
+        order: -1;
+    }
+
+    .masthead::before {
+        background: color-mix(in srgb, var(--bg) 86%, transparent);
+    }
+}
+
+/* ---------- Two-column intro + news ---------- */
+
+.home-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+    gap: 56px;
+    padding-top: 12px;
+}
+
+@media (max-width: 820px) {
+    .home-grid {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+}
+
+.news {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 0.95rem;
+}
+
+.news li {
+    display: grid;
+    grid-template-columns: 76px 1fr;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--rule);
+}
+
+.news li:first-child {
+    padding-top: 0;
+}
+
+.news time {
+    font-family: var(--sans);
+    font-size: 0.8rem;
+    color: var(--faint);
+    padding-top: 3px;
+}
+
+/* ---------- Research highlights ---------- */
+
+.band {
+    background: var(--band);
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    margin-top: 56px;
+    padding: 8px 0 48px;
+}
+
+.band h2 {
+    margin-top: 40px !important;
+}
+
+.section-intro {
+    color: var(--muted);
+    max-width: 44em;
+}
+
+.highlight {
+    margin: 28px 0 0;
+}
+
+.highlight h3 {
+    font-size: 1.15rem;
+    margin: 0 0 6px;
+}
+
+.highlight p {
+    font-size: 0.98rem;
+    margin-bottom: 8px !important;
+}
+
+.highlight .ref {
+    font-family: var(--sans);
+    font-size: 0.8rem;
+    color: var(--faint);
+}
+
+.figure {
+    margin: 0 0 14px;
+    background: var(--frame);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 10px;
+}
+
+.figure img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.figure figcaption {
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    color: #6b6b6b;
+    margin-top: 8px;
+    line-height: 1.45;
+}
+
+.highlight-pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+}
+
+@media (max-width: 760px) {
+    .highlight-pair {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+}
+
+.also {
+    margin-top: 32px;
+    font-size: 0.98rem;
+}
+
+/* ---------- Year-column publication list ---------- */
+
+.pubs.dated li {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: 12px;
+}
+
+.pubs.dated .yr {
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    color: var(--faint);
+    padding-top: 3px;
+}
+
+@media (max-width: 600px) {
+    .pubs.dated li {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+}
+
+/* ---------- Software feature ---------- */
+
+.feature {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: 36px;
+    align-items: start;
+}
+
+@media (max-width: 820px) {
+    .feature {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+}
+
+.feature h3 {
+    font-size: 1.3rem;
+    margin: 0 0 4px;
+}
+
+.feature .meta,
+.tool-grid .meta {
+    font-family: var(--sans);
+    font-size: 0.8rem;
+    color: var(--faint);
+}
+
+.feature ul {
+    padding-left: 20px;
+    margin: 10px 0 14px;
+    font-size: 0.97rem;
+}
+
+.text-links {
+    font-family: var(--sans);
+    font-size: 0.9rem;
+}
+
+.text-links a + a {
+    margin-left: 14px;
+}
+
+.tool-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 28px;
+    margin-top: 36px;
+    padding-top: 28px;
+    border-top: 1px solid var(--rule);
+}
+
+@media (max-width: 760px) {
+    .tool-grid {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+}
+
+.tool-grid h3 {
+    font-size: 1.02rem;
+    margin: 0 0 2px;
+}
+
+.tool-grid p {
+    font-size: 0.95rem;
+    margin: 6px 0 0 !important;
+}
+
+/* Inner pages: full-width frame, readable text column. */
+.inner > * {
+    max-width: var(--measure);
+}
+
+@media (max-width: 760px) {
+    .sim-caption {
+        display: none;
+    }
+}
+
+/* ==========================================================================
+   Motion
+   All effects are short, small in amplitude, and switched off for
+   prefers-reduced-motion. Reveal styles only apply once JS has loaded
+   (html.js), so content is never hidden without it.
+   ========================================================================== */
+
+:root {
+    --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* ---------- Sticky header ---------- */
+
+body.site .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: color-mix(in srgb, var(--bg) 90%, transparent);
+    backdrop-filter: saturate(150%) blur(8px);
+    -webkit-backdrop-filter: saturate(150%) blur(8px);
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+body.site .site-header.scrolled {
+    box-shadow: 0 1px 12px rgb(0 0 0 / 7%);
+}
+
+/* Nav: underline grows from the left on hover / current page. */
+.site-nav a {
+    position: relative;
+    padding: 2px 0;
+    transition: color 0.2s ease;
+}
+
+.site-nav a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -3px;
+    height: 1.5px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s var(--ease-out);
+}
+
+.site-nav a:hover::after,
+.site-nav a[aria-current="page"]::after {
+    transform: scaleX(1);
+}
+
+/* Body links: underline colour eases in. */
+body.site a {
+    transition: color 0.2s ease, text-decoration-color 0.2s ease;
+}
+
+/* ---------- Masthead entrance ---------- */
+
+@keyframes rise {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@keyframes settle {
+    from {
+        opacity: 0;
+        transform: scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@keyframes fade {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.masthead h1,
+.masthead .position,
+.masthead .summary,
+.masthead .contact {
+    animation: rise 0.8s var(--ease-out) both;
+}
+
+.masthead .position { animation-delay: 0.08s; }
+.masthead .summary { animation-delay: 0.16s; }
+.masthead .contact { animation-delay: 0.24s; }
+
+.masthead .portrait {
+    animation: settle 0.9s var(--ease-out) 0.15s both;
+    transition: transform 0.4s var(--ease-out), box-shadow 0.4s ease;
+}
+
+.masthead .portrait:hover {
+    transform: translateY(-3px) rotate(-0.6deg);
+    box-shadow: 0 12px 32px rgb(0 0 0 / 16%);
+}
+
+#grain-canvas {
+    animation: fade 1.2s ease both;
+    cursor: crosshair;
+}
+
+/* Let clicks on empty masthead space reach the canvas. */
+.masthead-inner {
+    pointer-events: none;
+}
+
+.masthead-inner h1,
+.masthead-inner p,
+.masthead-inner img {
+    pointer-events: auto;
+}
+
+.sim-caption {
+    animation: fade 1s ease 1s both;
+    pointer-events: none;
+}
+
+/* ---------- Scroll reveals ---------- */
+
+html.js [data-reveal] {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.7s ease, transform 0.8s var(--ease-out);
+    transition-delay: var(--reveal-delay, 0ms);
+}
+
+html.js [data-reveal].in {
+    opacity: 1;
+    transform: none;
+}
+
+/* ---------- Figures ---------- */
+
+.figure {
+    transition: box-shadow 0.35s ease, transform 0.35s var(--ease-out), border-color 0.35s ease;
+}
+
+.figure:has(img[data-zoom]):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgb(0 0 0 / 9%);
+}
+
+.figure img[data-zoom] {
+    cursor: zoom-in;
+}
+
+.figure img[data-zoom]:focus-visible {
+    outline: 2px solid var(--link);
+    outline-offset: 3px;
+}
+
+.lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: grid;
+    place-items: center;
+    padding: 32px 16px;
+    background: rgb(12 14 16 / 82%);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+    cursor: zoom-out;
+}
+
+.lightbox.open {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s ease;
+}
+
+.lightbox figure {
+    margin: 0;
+    max-width: min(1200px, 100%);
+    background: #fff;
+    padding: 14px;
+    border-radius: 4px;
+    transform: scale(0.96);
+    transition: transform 0.35s var(--ease-out);
+}
+
+.lightbox.open figure {
+    transform: none;
+}
+
+.lightbox img {
+    display: block;
+    max-width: 100%;
+    max-height: calc(100vh - 150px);
+    margin: 0 auto;
+    cursor: default;
+}
+
+.lightbox figcaption {
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    color: #555;
+    margin-top: 10px;
+}
+
+.lightbox-close {
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 12%);
+    color: #fff;
+    font-size: 1.6rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.lightbox-close:hover {
+    background: rgb(255 255 255 / 24%);
+}
+
+/* ---------- Screenshot showcase ---------- */
+
+.showcase .frame {
+    position: relative;
+    aspect-ratio: 1000 / 538;
+    overflow: hidden;
+    border-radius: 2px;
+}
+
+.showcase .slide {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 0;
+    transform: scale(1.015);
+    transition: opacity 0.9s ease, transform 5.5s ease-out;
+}
+
+.showcase .slide.active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Without JS, just show the first screenshot. */
+html:not(.js) .showcase .slide:first-child {
+    opacity: 1;
+}
+
+.showcase-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.showcase-caption {
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    color: #6b6b6b;
+    animation: fade 0.5s ease;
+}
+
+.showcase-dots {
+    display: flex;
+    gap: 6px;
+}
+
+.showcase-dots button {
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: #c9ccd0;
+    cursor: pointer;
+    transition: background-color 0.25s ease, transform 0.25s ease;
+}
+
+.showcase-dots button:hover {
+    transform: scale(1.3);
+}
+
+.showcase-dots button[aria-current="true"] {
+    background: var(--link);
+}
+
+.showcase-progress {
+    height: 2px;
+    margin-top: 8px;
+    background: #e6e6e6;
+    overflow: hidden;
+}
+
+.showcase-progress::before {
+    content: "";
+    display: block;
+    height: 100%;
+    background: var(--link);
+    transform: scaleX(0);
+    transform-origin: left;
+}
+
+.showcase-progress.run::before {
+    animation: progress 5s linear forwards;
+}
+
+.showcase.paused .showcase-progress.run::before {
+    animation-play-state: paused;
+}
+
+@keyframes progress {
+    to {
+        transform: scaleX(1);
+    }
+}
+
+/* ---------- News rows ---------- */
+
+.news li {
+    transition: background-color 0.25s ease;
+}
+
+/* ---------- Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    html.js [data-reveal] {
+        opacity: 1;
+        transform: none;
+    }
+}

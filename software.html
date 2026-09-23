@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Software · Albert Linda</title>
+    <meta name="description"
+        content="Research software by Albert Linda for atomistic modelling, DFT workflows, phase-field simulation and machine learning in materials science.">
+    <link rel="icon" href="resources/images/favicon.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
+    <script>document.documentElement.classList.add('js');</script>
+    <link rel="stylesheet" href="style/site.css">
+</head>
+
+<body class="site">
+    <header class="site-header">
+        <div class="wrap wide">
+            <a class="site-brand" href="index.html">Albert Linda</a>
+            <nav class="site-nav">
+                <a href="index.html">About</a>
+                <a href="publications.html">Publications</a>
+                <a href="software.html" aria-current="page">Software</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="wide inner">
+        <h1 class="page-title">Software</h1>
+        <p>Code I have written for my own research and made public. Everything is on
+            <a href="https://github.com/albert-hzbn" target="_blank" rel="noopener">GitHub</a>.</p>
+
+        <h2>Structure building and visualisation</h2>
+        <ul class="projects" data-reveal-stagger>
+            <li>
+                <a class="name" href="https://github.com/albert-hzbn/AtomForge" target="_blank"
+                    rel="noopener">AtomForge</a><span class="meta">C++ · Windows, Linux</span>
+                <p>A desktop application for building and inspecting atomic structures. It covers bulk crystals from
+                    space groups, substitutional solid solutions, CSL grain-boundary bicrystals, nanoparticles from
+                    shapes or Wulff constructions, Voronoi polycrystals and structures filling an OBJ/STL mesh, along
+                    with electronic post-processing. It comes with an illustrated manual.
+                    <a href="https://github.com/albert-hzbn/AtomForge/releases/latest" target="_blank"
+                        rel="noopener">Download</a> ·
+                    <a href="https://github.com/albert-hzbn/AtomForge/blob/main/docs/manual/AtomForge-manual.pdf"
+                        target="_blank" rel="noopener">manual</a> ·
+                    <a href="https://pypi.org/project/atomforge-py/" target="_blank" rel="noopener">Python
+                        package</a></p>
+            </li>
+            <li>
+                <a class="name" href="https://github.com/albert-hzbn/atoms_visualizer" target="_blank"
+                    rel="noopener">atoms_visualizer</a><span class="meta">Python · Blender add-on</span>
+                <p>Imports <code>.xyz</code> files into Blender as shaded atoms with automatic bonds, for
+                    rendering figures.</p>
+            </li>
+        </ul>
+
+        <h2>DFT and atomistic workflows</h2>
+        <ul class="projects" data-reveal-stagger>
+            <li>
+                <a class="name" href="https://github.com/albert-hzbn/SOTC" target="_blank" rel="noopener">SOTC</a><span
+                    class="meta">Python</span>
+                <p>Special optimal thermal cells. The idea borrows from SQS: instead of averaging over hundreds of
+                    stochastic snapshots, one 32–64 atom cell is optimised to reproduce the thermal
+                    displacement correlations of the crystal. Phonon dispersions, DOS and thermodynamic properties at
+                    high temperature then need only a few DFT calls.</p>
+            </li>
+            <li>
+                <a class="name" href="https://github.com/albert-hzbn/QEPP" target="_blank" rel="noopener">QEPP</a><span
+                    class="meta">C++17</span>
+                <p>A command-line pre- and post-processor for Quantum ESPRESSO. It generates inputs from CIF files and
+                    handles band structures, DOS and d-band centres, elastic constants, DFPT phonons, quasi-harmonic
+                    thermal expansion and C<sub>ij</sub>(T), Bader charges, STM images and convergence tests.</p>
+            </li>
+            <li>
+                <a class="name" href="https://github.com/albert-hzbn/fcc_gsfe" target="_blank"
+                    rel="noopener">fcc_gsfe</a><span class="meta">Python</span>
+                <p>Introduces stacking faults into an FCC POSCAR to set up generalized stacking-fault energy
+                    calculations.</p>
+            </li>
+            <li>
+                <a class="name" href="https://github.com/albert-hzbn/convert_SQS" target="_blank"
+                    rel="noopener">convert_SQS</a><span class="meta">Python</span>
+                <p>Converts ATAT special quasirandom structures to Quantum ESPRESSO or VASP format.</p>
+            </li>
+            <li>
+                <a class="name" href="https://github.com/albert-hzbn/ATAT-auto-calculate-energy" target="_blank"
+                    rel="noopener">ATAT-auto-calculate-energy</a><span class="meta">Shell</span>
+                <p>Automates the energy calculations in an ATAT cluster-expansion run.</p>
+            </li>
+            <li>
+                <a class="name" href="https://github.com/albert-hzbn/qe-equation-of-state" target="_blank"
+                    rel="noopener">qe-equation-of-state</a><span class="meta">Shell</span>
+                <p>Bulk modulus from an equation-of-state fit with Quantum ESPRESSO.</p>
+            </li>
+        </ul>
+
+        <h2>Machine learning</h2>
+        <ul class="projects" data-reveal-stagger>
+            <li>
+                <a class="name" href="https://github.com/albert-hzbn/LatentMatFusion" target="_blank"
+                    rel="noopener">LatentMatFusion</a><span class="meta">Python</span>
+                <p>Compresses VASP CHGCAR charge densities with a 3D convolutional autoencoder and combines the latent
+                    vector with Magpie descriptors in gradient-boosted models. It predicts bulk, Young's and shear
+                    moduli, formation energy and Debye temperature. This is the code behind our
+                    <a href="https://doi.org/10.1021/acs.jcim.6c00235" target="_blank" rel="noopener">JCIM
+                        paper</a>.</p>
+            </li>
+        </ul>
+
+        <h2>Phase-field</h2>
+        <ul class="projects" data-reveal-stagger>
+            <li>
+                <a class="name" href="https://github.com/albert-hzbn/phase_field" target="_blank"
+                    rel="noopener">phase_field</a><span class="meta">C++</span>
+                <p>A 2D Cahn–Hilliard solver for spinodal decomposition.</p>
+            </li>
+            <li>
+                <a class="name" href="https://github.com/albert-hzbn/Phase_Field_Julia" target="_blank"
+                    rel="noopener">Phase_Field_Julia</a><span class="meta">Julia</span>
+                <p>Phase-field models written in Julia.</p>
+            </li>
+        </ul>
+
+        <h2 id="web-tools">Web tools</h2>
+        <p>These run entirely in your browser; files are not uploaded anywhere.</p>
+        <ul class="projects" data-reveal-stagger>
+            <li>
+                <a class="name" href="loader.html">Atomic structure viewer</a>
+                <p>Opens <code>.xyz</code>, POSCAR and LAMMPS dump files in 3D, with supercell transformation and
+                    bond length and angle measurement.</p>
+            </li>
+            <li>
+                <a class="name" href="sqs_to_poscar.html">SQS to POSCAR</a>
+                <p>Converts an ATAT <code>bestsqs.out</code> file to a VASP POSCAR.</p>
+            </li>
+            <li>
+                <a class="name" href="grain_growth.html">Isotropic grain growth</a>
+                <p>A 2D multi-order-parameter phase-field simulation of grain coarsening.</p>
+            </li>
+            <li>
+                <a class="name" href="spinodal.html">Spinodal decomposition</a>
+                <p>A 2D Cahn–Hilliard simulation of phase separation.</p>
+            </li>
+        </ul>
+    </main>
+
+    <footer class="site-footer">
+        <div class="wrap wide">
+            <span>Albert Linda · Düsseldorf</span>
+            <span>
+                <a href="https://scholar.google.com/citations?user=o7FBjEcAAAAJ&hl=en" target="_blank"
+                    rel="noopener">Scholar</a><a href="https://github.com/albert-hzbn" target="_blank"
+                    rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/albert-hzbn/" target="_blank"
+                    rel="noopener">LinkedIn</a>
+            </span>
+        </div>
+    </footer>
+    <script src="dist/site.js"></script>
+</body>
+
+</html>

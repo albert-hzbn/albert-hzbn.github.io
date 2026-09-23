@@ -3,35 +3,311 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-
-    <link rel="stylesheet" href="style/style.css">
-    <style>
-        .aboutme-card {
-            background-color:rgb(0 0 0 / 60%);
-            color: rgb(255, 255, 255);
-            padding: 5%;
-            margin-bottom: 1%;
-        }
-
-        /* body {
-            background-image: url('../resources/images/bg.png');
-            background-repeat: no-repeat;
-            background-size: cover;
-            background-attachment: fixed;
-            background-position: center;
-        } */
-    </style>
-
+    <title>Albert Linda</title>
+    <meta name="description"
+        content="Albert Linda, postdoctoral researcher at the Max Planck Institute for Sustainable Materials. DFT, atomistic calculations, phase-field and microstructure modelling, and machine learning in materials science.">
+    <meta property="og:title" content="Albert Linda">
+    <meta property="og:image" content="https://albertlinda.com/resources/images/portrait.jpg">
+    <link rel="icon" href="resources/images/favicon.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
+    <script>document.documentElement.classList.add('js');</script>
+    <link rel="stylesheet" href="style/site.css">
 </head>
 
+<body class="site">
+    <header class="site-header">
+        <div class="wrap wide">
+            <a class="site-brand" href="index.html">Albert Linda</a>
+            <nav class="site-nav">
+                <a href="index.html" aria-current="page">About</a>
+                <a href="publications.html">Publications</a>
+                <a href="software.html">Software</a>
+            </nav>
+        </div>
+    </header>
 
-<body>
-    comming soon...
+    <section class="masthead">
+        <canvas id="grain-canvas" aria-hidden="true"></canvas>
+        <div class="wide masthead-inner">
+            <div>
+                <h1>Albert Linda</h1>
+                <p class="position">Postdoctoral researcher · Max Planck Institute for Sustainable Materials, Düsseldorf
+                </p>
+                <p class="summary">I connect the atomic scale to the microstructure of metals and alloys, using
+                    density functional theory, atomistic calculations, phase-field and microstructure modelling, and
+                    machine learning.</p>
+                <p class="contact">
+                    <a href="https://scholar.google.com/citations?user=o7FBjEcAAAAJ&hl=en" target="_blank"
+                        rel="noopener">Google Scholar</a> ·
+                    <a href="https://github.com/albert-hzbn" target="_blank" rel="noopener">GitHub</a> ·
+                    <a href="https://www.linkedin.com/in/albert-hzbn/" target="_blank" rel="noopener">LinkedIn</a> ·
+                    <a href="https://www.researchgate.net/profile/Albert-Linda" target="_blank"
+                        rel="noopener">ResearchGate</a>
+                </p>
+            </div>
+            <img class="portrait" src="resources/images/portrait.jpg" alt="Albert Linda" width="220" height="275">
+        </div>
+        <span class="sim-caption">Background: grain coarsening simulated live in your browser. Click to nucleate a recrystallised grain.</span>
+    </section>
+
+    <main>
+        <div class="wide home-grid">
+            <section data-reveal>
+                <h2>About</h2>
+                <p>I am a computational materials scientist at the Max Planck Institute for Sustainable Materials. My
+                    current work spans density functional theory (DFT), atomistic calculations, phase-field and
+                    microstructure modelling, and machine learning in materials science. I am interested in how
+                    defects and local chemistry at the atomic scale decide the microstructure and mechanical
+                    behaviour of metals and alloys.</p>
+                <p>I did my Ph.D. in Materials Science and Engineering at IIT Kanpur, working on stacking faults,
+                    grain-boundary segregation and grain growth. Before that I studied at IIT (BHU) Varanasi (M.Tech.)
+                    and NIAMT Ranchi (B.Tech.).</p>
+                <p>Alongside the science I write research software, from a desktop structure builder to Quantum
+                    ESPRESSO tooling. Most of it is <a href="software.html">open source</a>.</p>
+            </section>
+            <section data-reveal style="--reveal-delay:120ms">
+                <h2>News</h2>
+                <ul class="news">
+                    <li><time datetime="2026-09">Sep 2026</time><span><a
+                                href="https://github.com/albert-hzbn/AtomForge/releases/tag/v0.3.0" target="_blank"
+                                rel="noopener">AtomForge v0.3</a> released, with Windows and Linux builds.</span>
+                    </li>
+                    <li><time datetime="2026">2026</time><span>Charge-density representation learning paper
+                            published in <a href="https://doi.org/10.1021/acs.jcim.6c00235" target="_blank"
+                                rel="noopener"><em>J. Chem. Inf. Model.</em></a></span></li>
+                    <li><time datetime="2026-05">May 2026</time><span>Released <a
+                                href="https://github.com/albert-hzbn/SOTC" target="_blank" rel="noopener">SOTC</a>
+                            and <a href="https://github.com/albert-hzbn/QEPP" target="_blank"
+                                rel="noopener">QEPP</a> on GitHub.</span></li>
+                    <li><time datetime="2026-04">Apr 2026</time><span>First public release of AtomForge.</span></li>
+                    <li><time datetime="2025">2025</time><span>Abnormal grain growth paper published in <a
+                                href="https://doi.org/10.1016/j.actamat.2025.121861" target="_blank"
+                                rel="noopener"><em>Acta Materialia</em></a>.</span></li>
+                </ul>
+            </section>
+        </div>
+
+        <section class="band">
+            <div class="wide">
+                <h2 data-reveal>Research highlights</h2>
+                <p class="section-intro" data-reveal>Selected results, with figures from the papers.</p>
+
+                <article class="highlight" data-reveal>
+                    <figure class="figure">
+                        <img src="resources/images/work/agg-microstructure.jpg" data-zoom loading="lazy" width="972" height="258"
+                            alt="Four phase-field microstructures at increasing time: uniform grains that develop a few abnormally large grains">
+                        <figcaption>Phase-field grain growth with 10% high-mobility boundaries. A handful of grains
+                            escape and consume their neighbours.</figcaption>
+                    </figure>
+                    <h3>Why some grains grow abnormally</h3>
+                    <p>Abnormal grain growth undermines the microstructure control that heat treatment is meant to
+                        give. We computed segregation energies of nine solutes at three types of ⟨110⟩ tilt boundaries
+                        in α-Fe with DFT and fed them into phase-field simulations. Abnormal growth comes from
+                        grain-boundary anisotropy, and how strong it is depends on the solute. When roughly 10–30% of
+                        boundaries are highly mobile, grains develop crown-like shapes and grow abnormally.</p>
+                    <span class="ref"><em>Acta Materialia</em> (2025) · <a
+                            href="https://doi.org/10.1016/j.actamat.2025.121861" target="_blank"
+                            rel="noopener">paper</a> · <a href="https://arxiv.org/abs/2510.15840" target="_blank"
+                            rel="noopener">arXiv</a></span>
+                </article>
+
+                <div class="highlight-pair" data-reveal-stagger>
+                    <article class="highlight" data-reveal>
+                        <figure class="figure">
+                            <img src="resources/images/work/gb-segregation.jpg" data-zoom loading="lazy" width="1000" height="547"
+                                alt="Atomic structures of three symmetric tilt grain boundaries in iron with the boundary region highlighted">
+                            <figcaption>Σ3 and Σ9 symmetric tilt boundaries in α-Fe used for site-by-site segregation
+                                energies.</figcaption>
+                        </figure>
+                        <h3>Solute segregation from first principles</h3>
+                        <p>Site-resolved DFT segregation energies give phase-field models physically grounded input
+                            instead of fitted parameters. The same approach explains how Cr slows grain growth in
+                            nanocrystalline Fe.</p>
+                        <span class="ref"><a href="https://doi.org/10.1016/j.commatsci.2024.113509" target="_blank"
+                                rel="noopener"><em>Comput. Mater. Sci.</em> (2025)</a></span>
+                    </article>
+                    <article class="highlight" data-reveal>
+                        <figure class="figure">
+                            <img src="resources/images/work/charge-density.jpg" data-zoom loading="lazy" width="443" height="300"
+                                alt="Original and autoencoder-reconstructed electronic charge density of Mg2Pd, with their difference">
+                            <figcaption>Charge density of Mg<sub>2</sub>Pd: DFT, autoencoder reconstruction and the
+                                difference.</figcaption>
+                        </figure>
+                        <h3>Learning from the charge density</h3>
+                        <p>A 3D convolutional autoencoder compresses DFT charge densities of about 6,000 compounds into
+                            a compact latent vector. That vector predicts elastic moduli, formation energy and Debye
+                            temperature.</p>
+                        <span class="ref"><a href="https://doi.org/10.1021/acs.jcim.6c00235" target="_blank"
+                                rel="noopener"><em>J. Chem. Inf. Model.</em> (2026)</a> · <a
+                                href="https://github.com/albert-hzbn/LatentMatFusion" target="_blank"
+                                rel="noopener">code</a></span>
+                    </article>
+                </div>
+
+                <p class="also" data-reveal>I have also worked on stacking-fault energies of FCC metals under pressure and their
+                    prediction with machine learning (<a href="https://doi.org/10.1103/PhysRevB.109.214102"
+                        target="_blank" rel="noopener"><em>Phys. Rev. B</em> 2024</a>, <a
+                        href="https://doi.org/10.1016/j.mtla.2022.101598" target="_blank"
+                        rel="noopener"><em>Materialia</em> 2022</a>), and on solid-solution strengthening in high-entropy
+                    alloys with experimental colleagues (<a href="https://doi.org/10.1016/j.actamat.2022.118208"
+                        target="_blank" rel="noopener"><em>Acta Mater.</em> 2022</a>).</p>
+            </div>
+        </section>
+
+        <div class="wide">
+            <h2 data-reveal>Selected publications</h2>
+            <ul class="pubs dated" data-reveal-stagger>
+                <li>
+                    <span class="yr">2026</span>
+                    <div>
+                        <span class="title">Physics-aware representation learning on electronic charge density for
+                            materials property prediction</span>
+                        <span class="authors">K. S. Kumar, <span class="me">A. Linda</span>, S. K. Maurya, S.
+                            Bhowmick</span>
+                        <span class="venue"><em>Journal of Chemical Information and Modeling</em> 66, 7113
+                            <span class="links"><a href="https://doi.org/10.1021/acs.jcim.6c00235" target="_blank"
+                                    rel="noopener">doi</a><a href="https://arxiv.org/abs/2605.07227" target="_blank"
+                                    rel="noopener">arXiv</a></span></span>
+                    </div>
+                </li>
+                <li>
+                    <span class="yr">2025</span>
+                    <div>
+                        <span class="title">Multiscale modeling of abnormal grain growth: Role of solute segregation and
+                            grain boundary character</span>
+                        <span class="authors"><span class="me">A. Linda</span>, R. Mukherjee, S. Bhowmick</span>
+                        <span class="venue"><em>Acta Materialia</em>
+                            <span class="links"><a href="https://doi.org/10.1016/j.actamat.2025.121861" target="_blank"
+                                    rel="noopener">doi</a><a href="https://arxiv.org/abs/2510.15840" target="_blank"
+                                    rel="noopener">arXiv</a></span></span>
+                    </div>
+                </li>
+                <li>
+                    <span class="yr">2024</span>
+                    <div>
+                        <span class="title">Accelerating the prediction of stacking fault energy by combining ab initio
+                            calculations and machine learning</span>
+                        <span class="authors"><span class="me">A. Linda</span>, M. F. Akhtar, S. Pathak, S.
+                            Bhowmick</span>
+                        <span class="venue"><em>Physical Review B</em> 109, 214102
+                            <span class="links"><a href="https://doi.org/10.1103/PhysRevB.109.214102" target="_blank"
+                                    rel="noopener">doi</a></span></span>
+                    </div>
+                </li>
+                <li>
+                    <span class="yr">2024</span>
+                    <div>
+                        <span class="title">μ2mech: A software package combining microstructure modeling and mechanical
+                            property prediction</span>
+                        <span class="authors"><span class="me">A. Linda</span>, A. S. Negi, V. Panwar, R. Chafle, S.
+                            Bhowmick, K. Das, R. Mukherjee</span>
+                        <span class="venue"><em>Physica Scripta</em> 99, 055256
+                            <span class="links"><a href="https://doi.org/10.1088/1402-4896/ad38eb" target="_blank"
+                                    rel="noopener">doi</a></span></span>
+                    </div>
+                </li>
+                <li>
+                    <span class="yr">2022</span>
+                    <div>
+                        <span class="title">Effect of pressure on stacking fault energy and deformation behavior of
+                            face-centered cubic metals</span>
+                        <span class="authors"><span class="me">A. Linda</span>, P. K. Tripathi, S. Nagar, S.
+                            Bhowmick</span>
+                        <span class="venue"><em>Materialia</em> 26, 101598
+                            <span class="links"><a href="https://doi.org/10.1016/j.mtla.2022.101598" target="_blank"
+                                    rel="noopener">doi</a></span></span>
+                    </div>
+                </li>
+            </ul>
+            <p class="see-all"><a href="publications.html">All publications →</a></p>
+
+            <h2 data-reveal>Software</h2>
+            <div class="feature" data-reveal>
+                <figure class="figure showcase" aria-roledescription="carousel" aria-label="AtomForge screenshots">
+                    <div class="frame">
+                        <img class="slide" src="resources/images/work/atomforge-main.jpg" width="1000" height="538"
+                            loading="lazy" data-caption="Main window: an amorphous SiO2 model with several structures open in tabs"
+                            alt="AtomForge main window with menu bar, toolbar, file tabs and an amorphous silica structure">
+                        <img class="slide" src="resources/images/work/atomforge-charge.jpg" width="1000" height="538"
+                            loading="lazy" data-caption="Visualising electronic structure: charge-density isosurface and slice"
+                            alt="AtomForge electronic post-processing window showing a charge-density isosurface and slice">
+                        <img class="slide" src="resources/images/work/atomforge-alloy.jpg" width="1000" height="538"
+                            loading="lazy" data-caption="Colouring a Cu–Ni alloy by element from the View menu"
+                            alt="AtomForge main window with the View menu open over a Cu-Ni alloy nanoparticle">
+                        <img class="slide" src="resources/images/work/atomforge-wulff.jpg" width="1000" height="538"
+                            loading="lazy" data-caption="Building a nanoparticle from a Wulff construction"
+                            alt="AtomForge nanocrystal builder with a Wulff shape preview">
+                        <img class="slide" src="resources/images/work/atomforge-sro.jpg" width="1000" height="538"
+                            loading="lazy" data-caption="Warren–Cowley short-range order analysis"
+                            alt="AtomForge short-range order analysis dialog with per-shell tables">
+                    </div>
+                    <div class="showcase-progress" aria-hidden="true"></div>
+                    <div class="showcase-bar">
+                        <figcaption class="showcase-caption" aria-live="polite">Main window: an amorphous SiO2 model with several structures open in tabs</figcaption>
+                        <div class="showcase-dots"></div>
+                    </div>
+                </figure>
+                <div>
+                    <h3><a href="https://github.com/albert-hzbn/AtomForge" target="_blank"
+                            rel="noopener">AtomForge</a></h3>
+                    <span class="meta">C++ desktop application · Windows and Linux</span>
+                    <p style="margin-top:10px">A structure builder and viewer for atomistic modelling. It prepares
+                        inputs for MD and DFT and inspects the results in the same window.</p>
+                    <ul>
+                        <li>Bulk crystals from space groups, and solid-solution alloys</li>
+                        <li>CSL grain boundaries and Voronoi polycrystals</li>
+                        <li>Wulff nanoparticles and structures filling any mesh</li>
+                        <li>Electronic-structure visualisation and an illustrated manual</li>
+                    </ul>
+                    <p class="text-links"><a href="https://github.com/albert-hzbn/AtomForge/releases/latest"
+                            target="_blank" rel="noopener">Download</a><a
+                            href="https://github.com/albert-hzbn/AtomForge" target="_blank" rel="noopener">Source</a><a
+                            href="https://pypi.org/project/atomforge-py/" target="_blank" rel="noopener">Python
+                            package</a></p>
+                </div>
+            </div>
+
+            <div class="tool-grid" data-reveal-stagger>
+                <div>
+                    <h3><a href="https://github.com/albert-hzbn/SOTC" target="_blank" rel="noopener">SOTC</a></h3>
+                    <span class="meta">Python · phonons</span>
+                    <p>High-temperature phonons and thermodynamics from one small, optimised supercell instead of
+                        hundreds of stochastic snapshots.</p>
+                </div>
+                <div>
+                    <h3><a href="https://github.com/albert-hzbn/QEPP" target="_blank" rel="noopener">QEPP</a></h3>
+                    <span class="meta">C++ · Quantum ESPRESSO</span>
+                    <p>Input generation and analysis for Quantum ESPRESSO: bands, DOS, elastic constants, phonons and
+                        quasi-harmonic properties.</p>
+                </div>
+                <div>
+                    <h3><a href="https://github.com/albert-hzbn/LatentMatFusion" target="_blank"
+                            rel="noopener">LatentMatFusion</a></h3>
+                    <span class="meta">Python · machine learning</span>
+                    <p>Property prediction from VASP charge densities; the code behind the JCIM 2026 paper.</p>
+                </div>
+            </div>
+            <p class="see-all" style="margin-top:28px"><a href="software.html">All software and browser tools →</a></p>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="wrap wide">
+            <span>Albert Linda · Düsseldorf</span>
+            <span>
+                <a href="https://scholar.google.com/citations?user=o7FBjEcAAAAJ&hl=en" target="_blank"
+                    rel="noopener">Scholar</a><a href="https://github.com/albert-hzbn" target="_blank"
+                    rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/albert-hzbn/" target="_blank"
+                    rel="noopener">LinkedIn</a>
+            </span>
+        </div>
+    </footer>
+    <script src="dist/hero-grains.js"></script>
+    <script src="dist/site.js"></script>
 </body>
 
 </html>
