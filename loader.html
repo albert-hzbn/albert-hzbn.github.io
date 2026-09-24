@@ -2,115 +2,563 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Atomic Structure Viewer · Albert Linda</title>
-  <script type="importmap">
-    {
-      "imports": {
-        "three": "https://cdn.jsdelivr.net/npm/three@0.161/build/three.module.js",
-        "jsm/": "https://cdn.jsdelivr.net/npm/three@0.161/examples/jsm/"
-      }
-    }
-  </script>
-  <link rel="stylesheet" href="style/style.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Atomic Structure Builder · Albert Linda</title>
+    <meta name="description"
+        content="Build, edit and visualise crystal structures in the browser: space-group crystals, slabs, grain boundaries, nanoparticles, polycrystals and stacking faults. Ported from AtomForge.">
+    <link rel="icon" href="resources/images/favicon.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,600&display=swap">
+    <script>
+        // Theme before first paint: saved choice, else the system setting.
+        (function () {
+            let t = null;
+            try { t = localStorage.getItem('studio-theme'); } catch (e) { }
+            if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.dataset.theme = t;
+        })();
+    </script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.161/build/three.module.js",
+                "jsm/": "https://cdn.jsdelivr.net/npm/three@0.161/examples/jsm/"
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="style/studio.css">
 </head>
 
-<body>
-  <div id="container">
-    <canvas id="webgl-canvas"></canvas>
-    <div id="ui-panel">
-      <div id="atom-info">Atom info will appear here</div>
-      <button class="collapsible">File</button>
-      <div class="content">
-        <div>Load File(*.xyz, POSCAR, LAMMPS dump)</div>
-        <input type="file" id="fileInput" accept="" />
-      </div>
+<body class="studio">
+    <header class="topbar">
+        <button class="btn icon ghost panel-toggle" id="panel-toggle" aria-label="Show tools panel">
+            <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
+        </button>
+        <a class="brand" href="software.html#web-tools"><b>Structure Builder</b><span>ported from AtomForge · albertlinda.com</span></a>
 
-      <button class="collapsible">Transform Atoms</button>
-      <div class="content">
-        <div class="grid">
-          <input type="number" id="a1" , value="1">
-          <input type="number" id="b1" , value="0">
-          <input type="number" id="c1" , value="0">
-          <input type="number" id="a2" , value="0">
-          <input type="number" id="b2" , value="1">
-          <input type="number" id="c2" , value="0">
-          <input type="number" id="a3" , value="0">
-          <input type="number" id="b3" , value="0">
-          <input type="number" id="c3" , value="1">
+        <div class="toolbar">
+            <button class="btn" id="btn-open" title="Open a structure file (Ctrl+O)">
+                <svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></svg>
+                <span class="tb-hide-sm">Open</span>
+            </button>
+            <input type="file" id="file-input" hidden
+                accept=".xyz,.extxyz,.cif,.vasp,.pdb,.data,.lmp,.lammpstrj,.dump,.txt,*">
+            <div class="menu" id="menu-examples">
+                <button class="btn" data-menu>
+                    <svg viewBox="0 0 24 24"><circle cx="7" cy="7" r="3" /><circle cx="17" cy="7" r="3" /><circle cx="12" cy="17" r="3" /><path d="M9 9l2 5M15 9l-2 5M10 7h4" /></svg>
+                    <span class="tb-hide-sm">Examples</span>
+                </button>
+                <div class="menu-list" id="examples-list"></div>
+            </div>
+            <div class="menu" id="menu-export">
+                <button class="btn" data-menu>
+                    <svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14" /></svg>
+                    <span class="tb-hide-sm">Export</span>
+                </button>
+                <div class="menu-list">
+                    <div class="menu-title">Structure</div>
+                    <button data-export="poscar">VASP POSCAR <span class="hint">.vasp</span></button>
+                    <button data-export="xyz">Extended XYZ <span class="hint">.xyz</span></button>
+                    <button data-export="cif">CIF (P1) <span class="hint">.cif</span></button>
+                    <button data-export="lammps">LAMMPS data <span class="hint">.data</span></button>
+                    <hr>
+                    <div class="menu-title">Image</div>
+                    <button data-export="png">PNG image <span class="hint">2×</span></button>
+                    <button data-export="png-t">PNG, transparent <span class="hint">4×</span></button>
+                </div>
+            </div>
+            <span class="tb-sep"></span>
+            <button class="btn icon ghost" id="btn-undo" title="Undo (Ctrl+Z)" aria-label="Undo">
+                <svg viewBox="0 0 24 24"><path d="M9 14L4 9l5-5" /><path d="M4 9h10a6 6 0 0 1 0 12h-3" /></svg>
+            </button>
+            <button class="btn icon ghost" id="btn-redo" title="Redo (Ctrl+Y)" aria-label="Redo">
+                <svg viewBox="0 0 24 24"><path d="M15 14l5-5-5-5" /><path d="M20 9H10a6 6 0 0 0 0 12h3" /></svg>
+            </button>
+            <span class="tb-sep"></span>
+            <button class="btn icon ghost" id="btn-theme" title="Light / dark" aria-label="Toggle dark mode">
+                <svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" /></svg>
+            </button>
         </div>
-        <button onclick="transformStructure()">Transform</button>
-      </div>
-      <button class="collapsible">Measurement</button>
-      <div class="content">
-        <div class="bond-distance">
-          <button id="bond-length-btn" onclick="measureBondLength()">Bond Distance</button>
-          <button onclick="clearBondLengthInfo()">Clear</button>
-          <div id="bond-length-info">N/A</div>
-        </div>
-        <div class="bond-angle">
-          <button id="bond-angle-btn" onclick="measureBondAngle()">Bond Angle</button>
-          <button onclick="clearBondAngleInfo()">Clear</button>
-          <div id="bond-angle-info">N/A</div>
-        </div>
-      </div>
+    </header>
 
+    <main class="workspace">
+        <aside class="panel" aria-label="Tools">
+            <nav class="tabs" role="tablist">
+                <button role="tab" aria-selected="true" data-tab="build">Build</button>
+                <button role="tab" aria-selected="false" data-tab="edit">Edit</button>
+                <button role="tab" aria-selected="false" data-tab="view">View</button>
+                <button role="tab" aria-selected="false" data-tab="analyze">Analyze</button>
+            </nav>
 
+            <!-- ================= BUILD ================= -->
+            <div class="tab-body" data-body="build">
+                <details class="sec" open id="sec-crystal">
+                    <summary>Bulk crystal <span class="tag">space group</span></summary>
+                    <div class="sec-body">
+                        <label class="field"><span>Preset</span>
+                            <select id="cr-preset"></select></label>
+                        <div class="row c2">
+                            <label class="field"><span>Crystal system</span>
+                                <select id="cr-system">
+                                    <option value="triclinic">Triclinic</option>
+                                    <option value="monoclinic">Monoclinic</option>
+                                    <option value="orthorhombic">Orthorhombic</option>
+                                    <option value="tetragonal">Tetragonal</option>
+                                    <option value="trigonal">Trigonal</option>
+                                    <option value="hexagonal">Hexagonal</option>
+                                    <option value="cubic" selected>Cubic</option>
+                                </select></label>
+                            <label class="field"><span>Space group</span>
+                                <select id="cr-sg"></select></label>
+                        </div>
+                        <label class="field"><span>Setting</span><select id="cr-setting"></select></label>
+                        <div class="row c3">
+                            <label class="field"><span>a (Å)</span><input type="number" step="0.001" id="cr-a"></label>
+                            <label class="field"><span>b (Å)</span><input type="number" step="0.001" id="cr-b"></label>
+                            <label class="field"><span>c (Å)</span><input type="number" step="0.001" id="cr-c"></label>
+                            <label class="field"><span>α (°)</span><input type="number" step="0.01" id="cr-al"></label>
+                            <label class="field"><span>β (°)</span><input type="number" step="0.01" id="cr-be"></label>
+                            <label class="field"><span>γ (°)</span><input type="number" step="0.01" id="cr-ga"></label>
+                        </div>
+                        <div>
+                            <div class="table" id="cr-sites"></div>
+                            <button class="link-btn" id="cr-add-site">+ Add site</button>
+                        </div>
+                        <p class="note" id="cr-note">Symmetry-equivalent positions are generated from the
+                            asymmetric unit.</p>
+                        <button class="btn primary block" id="cr-build">Build crystal</button>
+                    </div>
+                </details>
 
-      <button class="collapsible">About</button>
-      <div class="content">
-        <div class="about-container">
-          <p>
-            A simple atomic visualizer that allows you to view <code>*.xyz</code>, <code>POSCAR</code>, and
-            <code>LAMMPS dump</code> files directly in your browser.
-            To get started, click on <strong>File &gt; Choose File</strong> to load a structure. You can view atomic
-            positions in Cartesian coordinates by hovering over individual atoms.
-          </p>
+                <details class="sec" id="sec-supercell">
+                    <summary>Supercell &amp; transformation</summary>
+                    <div class="sec-body">
+                        <div class="row c4">
+                            <label class="field"><span>n<sub>a</sub></span><input type="number" min="1" value="2" id="sc-a"></label>
+                            <label class="field"><span>n<sub>b</sub></span><input type="number" min="1" value="2" id="sc-b"></label>
+                            <label class="field"><span>n<sub>c</sub></span><input type="number" min="1" value="2" id="sc-c"></label>
+                            <button class="btn" id="sc-apply">Apply</button>
+                        </div>
+                        <p class="note">General transformation: new cell rows = P · (a, b, c).</p>
+                        <div class="matrix" id="tm">
+                            <input value="1"><input value="0"><input value="0">
+                            <input value="0"><input value="1"><input value="0">
+                            <input value="0"><input value="0"><input value="1">
+                        </div>
+                        <div class="row c2">
+                            <button class="btn" id="tm-prim">Primitive (F/I)…</button>
+                            <button class="btn" id="tm-apply">Transform</button>
+                        </div>
+                    </div>
+                </details>
 
-          <p>
-            Once a structure is loaded, you can:
-          <ul>
-            <li>Create a supercell from the original structure</li>
-            <li>Measure bond distances and bond angles</li>
-          </ul>
-          Additional features will be added in future updates.
-          </p>
+                <details class="sec" id="sec-slab">
+                    <summary>Surface slab <span class="tag">(hkl)</span></summary>
+                    <div class="sec-body">
+                        <p class="note">Cut from the current crystal.</p>
+                        <div class="row c3">
+                            <label class="field"><span>h</span><input type="number" value="1" id="sl-h"></label>
+                            <label class="field"><span>k</span><input type="number" value="1" id="sl-k"></label>
+                            <label class="field"><span>l</span><input type="number" value="1" id="sl-l"></label>
+                        </div>
+                        <div class="row c3">
+                            <label class="field"><span>Layers</span><input type="number" min="1" value="4" id="sl-layers"></label>
+                            <label class="field"><span>Vacuum (Å)</span><input type="number" min="0" value="12" id="sl-vac"></label>
+                            <label class="field"><span>In-plane</span><input type="text" value="1 1" id="sl-rep" title="Lateral repeats, e.g. 3 3"></label>
+                        </div>
+                        <button class="btn primary block" id="sl-build">Build slab</button>
+                    </div>
+                </details>
 
-          <h4>Structure Visualization</h4>
-          <p>
-            Click and drag to rotate the structure. Use mouse scroll to rotate to zoom in and out. Right click and drag
-            to move the structure.
-          </p>
+                <details class="sec" id="sec-gb">
+                    <summary>Grain boundary <span class="tag">CSL tilt</span></summary>
+                    <div class="sec-body">
+                        <p class="note">Symmetric tilt boundaries in cubic crystals. Uses the current cubic crystal
+                            (conventional cell).</p>
+                        <div class="row c2">
+                            <label class="field"><span>Tilt axis</span>
+                                <select id="gb-axis">
+                                    <option value="0,0,1">[001]</option>
+                                    <option value="1,-1,0" selected>[1-10]</option>
+                                    <option value="1,1,1">[111]</option>
+                                    <option value="1,1,0">[110]</option>
+                                </select></label>
+                            <label class="field"><span>Max Σ</span><input type="number" value="51" id="gb-maxsig"></label>
+                        </div>
+                        <div class="gb-list" id="gb-list"></div>
+                        <div class="row c3">
+                            <label class="field"><span>Grain ⊥</span><input type="number" min="1" value="3" id="gb-n1" title="Repeats normal to the boundary"></label>
+                            <label class="field"><span>In plane</span><input type="number" min="1" value="1" id="gb-n2"></label>
+                            <label class="field"><span>Along axis</span><input type="number" min="1" value="2" id="gb-n3"></label>
+                        </div>
+                        <div class="row c3">
+                            <label class="field"><span>Shift y (frac)</span><input type="number" step="0.05" value="0" id="gb-sy"></label>
+                            <label class="field"><span>Shift z (frac)</span><input type="number" step="0.05" value="0" id="gb-sz"></label>
+                            <label class="field"><span>Overlap</span><input type="number" step="0.05" value="0.7" id="gb-ov" title="Remove atoms closer than this × nearest-neighbour distance"></label>
+                        </div>
+                        <button class="btn primary block" id="gb-build">Build bicrystal</button>
+                    </div>
+                </details>
 
-          <h4>Transform Atoms</h4>
-          <p>
-            Click on <strong>Transform Atoms</strong> in the right panel. Enter the transformation matrix and then click
-            <strong>Transform</strong> to apply it to the structure.
-          </p>
+                <details class="sec" id="sec-nano">
+                    <summary>Nanoparticle <span class="tag">shape · Wulff</span></summary>
+                    <div class="sec-body">
+                        <div class="seg" id="np-mode">
+                            <button aria-pressed="true" data-v="shape">Shape</button>
+                            <button aria-pressed="false" data-v="wulff">Wulff construction</button>
+                        </div>
+                        <div id="np-shape-opts" class="sec-body" style="padding:0">
+                            <label class="field"><span>Shape</span><select id="np-shape"></select></label>
+                            <div class="row c3">
+                                <label class="field"><span>Radius (Å)</span><input type="number" value="12" id="np-r"></label>
+                                <label class="field"><span>Height (Å)</span><input type="number" value="24" id="np-h"></label>
+                                <label class="field"><span>R<sub>y</sub> (Å)</span><input type="number" value="8" id="np-ry"></label>
+                            </div>
+                        </div>
+                        <div id="np-wulff-opts" class="sec-body" style="padding:0" hidden>
+                            <label class="field"><span>Size: distance to lowest-energy facet (Å)</span><input type="number" value="14" id="wf-r"></label>
+                            <div class="table facets" id="wf-facets"></div>
+                            <button class="link-btn" id="wf-add">+ Add facet family</button>
+                            <label class="check"><input type="checkbox" id="wf-cubic" checked> Apply cubic symmetry to families</label>
+                        </div>
+                        <div class="row c2">
+                            <label class="field"><span>Centre on</span>
+                                <select id="np-center"><option value="atom">An atom</option><option value="void">Cell centre</option></select></label>
+                            <label class="field"><span>Vacuum (Å)</span><input type="number" value="8" id="np-vac"></label>
+                        </div>
+                        <button class="btn primary block" id="np-build">Build nanoparticle</button>
+                    </div>
+                </details>
 
-          <h4>Bond Distance Measurement</h4>
-          <p>
-            Go to <strong>Measurement &gt; Bond Distance</strong>. Click on the first atom, then the second atom—the
-            distance between them will be displayed.
-            Click <strong>Clear</strong> to perform a new measurement.
-          </p>
+                <details class="sec" id="sec-poly">
+                    <summary>Polycrystal <span class="tag">Voronoi</span></summary>
+                    <div class="sec-body">
+                        <p class="note">Randomly oriented grains of the current crystal in a periodic box.</p>
+                        <div class="row c3">
+                            <label class="field"><span>L<sub>x</sub> (Å)</span><input type="number" value="50" id="pc-x"></label>
+                            <label class="field"><span>L<sub>y</sub> (Å)</span><input type="number" value="50" id="pc-y"></label>
+                            <label class="field"><span>L<sub>z</sub> (Å)</span><input type="number" value="50" id="pc-z"></label>
+                        </div>
+                        <div class="row c3">
+                            <label class="field"><span>Grains</span><input type="number" min="2" value="8" id="pc-n"></label>
+                            <label class="field"><span>Seed</span><input type="number" value="1" id="pc-seed"></label>
+                            <label class="field"><span>Overlap</span><input type="number" step="0.05" value="0.7" id="pc-ov"></label>
+                        </div>
+                        <button class="btn primary block" id="pc-build">Build polycrystal</button>
+                    </div>
+                </details>
 
-          <h4>Bond Angle Measurement</h4>
-          <p>
-            Go to <strong>Measurement &gt; Bond Angle</strong>. Click on three atoms in order: first, second, and third.
-            The bond angle formed at the second atom (between the first and third) will be shown.
-            Click <strong>Clear</strong> to measure another angle.
-          </p>
-        </div>
-      </div>
-    </div>
+                <details class="sec" id="sec-sf">
+                    <summary>Stacking fault <span class="tag">FCC · GSFE</span></summary>
+                    <div class="sec-body">
+                        <p class="note">(111) stacking with the upper half displaced along [11-2]. Uses the current FCC
+                            crystal.</p>
+                        <div class="range"><span>Displacement u (units of b<sub>p</sub> = a/√6)</span>
+                            <input type="range" min="0" max="2" step="0.05" value="1" id="sf-u"><output id="sf-u-out">1.00</output></div>
+                        <div class="seg" id="sf-presets">
+                            <button data-u="0" aria-pressed="false">Perfect</button>
+                            <button data-u="0.5" aria-pressed="false">Unstable</button>
+                            <button data-u="1" aria-pressed="true">Intrinsic</button>
+                        </div>
+                        <div class="row c3">
+                            <label class="field"><span>[1-10]</span><input type="number" min="1" value="2" id="sf-nx"></label>
+                            <label class="field"><span>[11-2]</span><input type="number" min="1" value="1" id="sf-ny"></label>
+                            <label class="field"><span>[111]</span><input type="number" min="2" value="4" id="sf-nz"></label>
+                        </div>
+                        <button class="btn primary block" id="sf-build">Build stacking fault</button>
+                    </div>
+                </details>
 
-  </div>
+                <details class="sec" id="sec-ss">
+                    <summary>Solid solution <span class="tag">random</span></summary>
+                    <div class="sec-body">
+                        <label class="field"><span>Host species</span><select id="ss-host"></select></label>
+                        <div class="table solutes" id="ss-solutes"></div>
+                        <button class="link-btn" id="ss-add">+ Add solute</button>
+                        <label class="field"><span>Random seed</span><input type="number" value="1" id="ss-seed"></label>
+                        <button class="btn primary block" id="ss-build">Substitute</button>
+                    </div>
+                </details>
+            </div>
 
-  </div>
-  <script src="dist/structure_loader/ui.js"></script>
-  <script type="module" src="dist/structure_loader/index.js"></script>
+            <!-- ================= EDIT ================= -->
+            <div class="tab-body" data-body="edit" hidden>
+                <details class="sec" open>
+                    <summary>Selection <span class="tag" id="sel-count">none</span></summary>
+                    <div class="sec-body">
+                        <p class="note">Click an atom to select it. Ctrl/⌘-click adds or removes; Shift-drag selects
+                            a box.</p>
+                        <div class="row c3">
+                            <button class="btn" id="sel-all">All</button>
+                            <button class="btn" id="sel-none">None</button>
+                            <button class="btn" id="sel-invert">Invert</button>
+                        </div>
+                        <div class="row c2">
+                            <select class="input" id="sel-el"></select>
+                            <button class="btn" id="sel-by-el">Select element</button>
+                        </div>
+                        <div class="row c2">
+                            <label class="field"><span>Neighbours within (Å)</span><input type="number" step="0.1" value="3" id="sel-r"></label>
+                            <button class="btn" id="sel-grow">Grow selection</button>
+                        </div>
+                    </div>
+                </details>
+
+                <details class="sec" open id="sec-atom">
+                    <summary>Selected atoms</summary>
+                    <div class="sec-body">
+                        <div id="atom-editor"></div>
+                        <div class="row c2">
+                            <input class="input" id="ed-el" placeholder="Element, e.g. Ni">
+                            <button class="btn" id="ed-set-el">Change element</button>
+                        </div>
+                        <div class="row c4">
+                            <label class="field"><span>Δx</span><input type="number" step="0.1" value="0" id="ed-dx"></label>
+                            <label class="field"><span>Δy</span><input type="number" step="0.1" value="0" id="ed-dy"></label>
+                            <label class="field"><span>Δz</span><input type="number" step="0.1" value="0" id="ed-dz"></label>
+                            <button class="btn" id="ed-move">Move</button>
+                        </div>
+                        <div class="row c2">
+                            <button class="btn" id="ed-dup">Duplicate</button>
+                            <button class="btn danger" id="ed-del">Delete</button>
+                        </div>
+                    </div>
+                </details>
+
+                <details class="sec">
+                    <summary>Add atom</summary>
+                    <div class="sec-body">
+                        <div class="row c4">
+                            <label class="field"><span>Element</span><input value="C" id="add-el"></label>
+                            <label class="field"><span id="add-lx">x</span><input type="number" step="0.01" value="0" id="add-x"></label>
+                            <label class="field"><span id="add-ly">y</span><input type="number" step="0.01" value="0" id="add-y"></label>
+                            <label class="field"><span id="add-lz">z</span><input type="number" step="0.01" value="0" id="add-z"></label>
+                        </div>
+                        <label class="check"><input type="checkbox" id="add-frac"> Fractional coordinates</label>
+                        <button class="btn block" id="add-btn">Add atom</button>
+                    </div>
+                </details>
+
+                <details class="sec">
+                    <summary>Cell</summary>
+                    <div class="sec-body">
+                        <div class="row c3">
+                            <label class="field"><span>a (Å)</span><input type="number" step="0.001" id="ce-a"></label>
+                            <label class="field"><span>b (Å)</span><input type="number" step="0.001" id="ce-b"></label>
+                            <label class="field"><span>c (Å)</span><input type="number" step="0.001" id="ce-c"></label>
+                            <label class="field"><span>α (°)</span><input type="number" step="0.01" id="ce-al"></label>
+                            <label class="field"><span>β (°)</span><input type="number" step="0.01" id="ce-be"></label>
+                            <label class="field"><span>γ (°)</span><input type="number" step="0.01" id="ce-ga"></label>
+                        </div>
+                        <label class="check"><input type="checkbox" id="ce-scale" checked> Scale atoms with the cell</label>
+                        <button class="btn block" id="ce-apply">Apply cell</button>
+                        <div class="row c2">
+                            <label class="field"><span>Vacuum along c (Å)</span><input type="number" value="10" id="ce-vac"></label>
+                            <button class="btn" id="ce-vac-btn">Add vacuum</button>
+                        </div>
+                        <div class="row c3">
+                            <button class="btn" id="ce-wrap">Wrap</button>
+                            <button class="btn" id="ce-center">Centre</button>
+                            <button class="btn" id="ce-remove">Remove cell</button>
+                        </div>
+                    </div>
+                </details>
+
+                <details class="sec">
+                    <summary>Species &amp; title</summary>
+                    <div class="sec-body">
+                        <div class="row c3">
+                            <select class="input" id="rn-from"></select>
+                            <input class="input" id="rn-to" placeholder="New">
+                            <button class="btn" id="rn-apply">Rename</button>
+                        </div>
+                        <div class="row c2">
+                            <input class="input" id="title-in" placeholder="Title">
+                            <button class="btn" id="title-apply">Set title</button>
+                        </div>
+                        <button class="btn" id="ed-dedupe">Remove overlapping atoms (&lt; 0.5 Å)</button>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ================= VIEW ================= -->
+            <div class="tab-body" data-body="view" hidden>
+                <details class="sec" open>
+                    <summary>Style</summary>
+                    <div class="sec-body">
+                        <div class="seg" id="v-style">
+                            <button data-v="ball" aria-pressed="true">Ball &amp; stick</button>
+                            <button data-v="space" aria-pressed="false">Space filling</button>
+                            <button data-v="stick" aria-pressed="false">Sticks</button>
+                        </div>
+                        <div class="range"><span>Atom size</span><input type="range" min="0.2" max="1.6" step="0.05" value="1" id="v-atom"><output id="v-atom-out">1.00</output></div>
+                        <div class="range"><span>Bond radius (Å)</span><input type="range" min="0.04" max="0.35" step="0.01" value="0.14" id="v-bond"><output id="v-bond-out">0.14</output></div>
+                        <div class="range"><span>Bond tolerance</span><input type="range" min="0.8" max="1.6" step="0.01" value="1.15" id="v-tol"><output id="v-tol-out">1.15</output></div>
+                        <label class="check"><input type="checkbox" id="v-bonds" checked> Show bonds</label>
+                        <label class="check"><input type="checkbox" id="v-labels"> Element labels (small structures)</label>
+                    </div>
+                </details>
+
+                <details class="sec" open>
+                    <summary>Colour</summary>
+                    <div class="sec-body">
+                        <label class="field"><span>Colour atoms by</span>
+                            <select id="v-color">
+                                <option value="element">Element</option>
+                                <option value="tag">Grain / region</option>
+                                <option value="cn">Coordination number</option>
+                                <option value="height">Height along z</option>
+                            </select></label>
+                        <div class="legend" id="legend"></div>
+                    </div>
+                </details>
+
+                <details class="sec" open>
+                    <summary>Cell &amp; images</summary>
+                    <div class="sec-body">
+                        <label class="check"><input type="checkbox" id="v-cell" checked> Show unit cell</label>
+                        <label class="check"><input type="checkbox" id="v-boundary" checked> Show atoms on cell faces</label>
+                        <p class="note">Display repeats (does not change the structure):</p>
+                        <div class="row c3">
+                            <label class="field"><span>× a</span><input type="number" min="1" value="1" id="v-ra"></label>
+                            <label class="field"><span>× b</span><input type="number" min="1" value="1" id="v-rb"></label>
+                            <label class="field"><span>× c</span><input type="number" min="1" value="1" id="v-rc"></label>
+                        </div>
+                    </div>
+                </details>
+
+                <details class="sec">
+                    <summary>Planes &amp; directions</summary>
+                    <div class="sec-body">
+                        <p class="note">Lattice plane (hkl) at distance d from the origin, in units of d<sub>hkl</sub>.</p>
+                        <div class="row c4">
+                            <label class="field"><span>h</span><input type="number" value="1" id="pl-h"></label>
+                            <label class="field"><span>k</span><input type="number" value="1" id="pl-k"></label>
+                            <label class="field"><span>l</span><input type="number" value="1" id="pl-l"></label>
+                            <label class="field"><span>d</span><input type="number" step="0.25" value="1" id="pl-d"></label>
+                        </div>
+                        <label class="check"><input type="checkbox" id="pl-on"> Show plane</label>
+                        <div class="row c3">
+                            <label class="field"><span>u</span><input type="number" value="1" id="dir-u"></label>
+                            <label class="field"><span>v</span><input type="number" value="1" id="dir-v"></label>
+                            <label class="field"><span>w</span><input type="number" value="0" id="dir-w"></label>
+                        </div>
+                        <label class="check"><input type="checkbox" id="dir-on"> Show direction [uvw]</label>
+                    </div>
+                </details>
+
+                <details class="sec">
+                    <summary>Camera</summary>
+                    <div class="sec-body">
+                        <div class="seg" id="v-proj">
+                            <button data-v="orthographic" aria-pressed="true">Orthographic</button>
+                            <button data-v="perspective" aria-pressed="false">Perspective</button>
+                        </div>
+                        <label class="check"><input type="checkbox" id="v-rotate"> Auto-rotate</label>
+                        <div class="row c4">
+                            <label class="field"><span>View [u</span><input type="number" value="1" id="va-u"></label>
+                            <label class="field"><span>v</span><input type="number" value="1" id="va-v"></label>
+                            <label class="field"><span>w]</span><input type="number" value="1" id="va-w"></label>
+                            <button class="btn" id="va-go">Look</button>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ================= ANALYZE ================= -->
+            <div class="tab-body" data-body="analyze" hidden>
+                <details class="sec" open>
+                    <summary>Structure</summary>
+                    <div class="sec-body">
+                        <dl class="kv" id="info"></dl>
+                    </div>
+                </details>
+                <details class="sec" open>
+                    <summary>Radial distribution function</summary>
+                    <div class="sec-body">
+                        <div class="row c2">
+                            <label class="field"><span>Reference</span><select id="rdf-a"></select></label>
+                            <label class="field"><span>Target</span><select id="rdf-b"></select></label>
+                        </div>
+                        <div class="row c3">
+                            <label class="field"><span>r<sub>max</sub> (Å)</span><input type="number" value="8" id="rdf-r"></label>
+                            <label class="field"><span>Bins</span><input type="number" value="200" id="rdf-bins"></label>
+                            <button class="btn" id="rdf-go">Compute</button>
+                        </div>
+                        <canvas class="plot" id="rdf-plot" width="600" height="380"></canvas>
+                        <dl class="kv" id="rdf-summary"></dl>
+                    </div>
+                </details>
+                <details class="sec" open>
+                    <summary>Coordination</summary>
+                    <div class="sec-body">
+                        <p class="note">From the bonds shown in the viewer (see View → bond tolerance).</p>
+                        <dl class="kv" id="cn-table"></dl>
+                    </div>
+                </details>
+                <details class="sec" open>
+                    <summary>Measurements</summary>
+                    <div class="sec-body">
+                        <p class="note">Pick a measuring mode at the bottom of the viewer, then click atoms.</p>
+                        <div class="measure-list" id="measure-list"></div>
+                        <button class="link-btn" id="measure-clear">Clear measurements</button>
+                    </div>
+                </details>
+                <details class="sec">
+                    <summary>About this tool</summary>
+                    <div class="sec-body">
+                        <p class="note">A browser port of the structure-building and visualisation tools in
+                            <a href="https://github.com/albert-hzbn/AtomForge" target="_blank" rel="noopener">AtomForge</a>.
+                            Everything runs locally in your browser; files are never uploaded.</p>
+                        <p class="note">Space-group operations for all 230 groups (530 settings) come from the
+                            <a href="https://github.com/spglib/spglib" target="_blank" rel="noopener">spglib</a> database
+                            (BSD-3-Clause). The surface-slab basis follows the algorithm of ASE's
+                            <code>ase.build.surface</code>. Rendering uses three.js.</p>
+                        <p class="note">Keyboard: F fit · 1/2/3 view along a/b/c · S select · D distance · A angle ·
+                            Ctrl+A select all · Delete remove · Ctrl+Z / Ctrl+Y undo / redo · Esc clear.</p>
+                    </div>
+                </details>
+            </div>
+        </aside>
+
+        <section class="viewport" id="viewport" aria-label="3D view">
+            <div class="hud">
+                <div class="hud-title"><b id="hud-title">Loading…</b><span id="hud-sub"></span></div>
+                <div class="floating view-tools" id="view-tools">
+                    <button class="btn" data-view="a" title="View along a">a</button>
+                    <button class="btn" data-view="b" title="View along b">b</button>
+                    <button class="btn" data-view="c" title="View along c">c</button>
+                    <button class="btn" data-view="fit" title="Fit to view (F)">
+                        <svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" /></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="floating modebar" id="modebar" role="toolbar" aria-label="Interaction mode">
+                <button class="btn" data-mode="select" aria-pressed="true" title="Select atoms (S)">Select</button>
+                <button class="btn" data-mode="distance" aria-pressed="false" title="Measure distance (D)">Distance</button>
+                <button class="btn" data-mode="angle" aria-pressed="false" title="Measure angle (A)">Angle</button>
+                <button class="btn" data-mode="dihedral" aria-pressed="false" title="Measure dihedral">Dihedral</button>
+            </div>
+            <div class="hover-card" id="hover-card"></div>
+            <div class="select-rect" id="select-rect"></div>
+            <div class="drop-overlay">Drop a structure file to open it</div>
+            <div class="busy" id="busy"><div><div class="spinner"></div><span id="busy-text">Building…</span></div></div>
+        </section>
+    </main>
+
+    <footer class="statusbar">
+        <span><b id="st-atoms">0</b> atoms</span>
+        <span id="st-formula"></span>
+        <span id="st-cell"></span>
+        <span id="st-sel"></span>
+        <span class="hint" id="st-hint">Drag to rotate · right-drag to pan · scroll to zoom · drop a file to open it</span>
+    </footer>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script type="module" src="dist/structure_studio/app.js"></script>
 </body>
 
 </html>
