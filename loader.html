@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Atomic Structure Builder · Albert Linda</title>
+    <title>AtomForge Web · Albert Linda</title>
     <meta name="description"
         content="Build, edit and visualise crystal structures in the browser: space-group crystals, slabs, grain boundaries, nanoparticles, polycrystals and stacking faults. Ported from AtomForge.">
     <link rel="icon" href="resources/images/favicon.jpg">
@@ -37,7 +37,7 @@
         <button class="btn icon ghost panel-toggle" id="panel-toggle" aria-label="Show tools panel">
             <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
         </button>
-        <a class="brand" href="software.html#web-tools"><b>Structure Builder</b><span>ported from AtomForge · albertlinda.com</span></a>
+        <a class="brand" href="software.html#web-tools"><b>AtomForge Web</b><span>structure builder · albertlinda.com</span></a>
 
         <div class="toolbar">
             <button class="btn" id="btn-open" title="Open a structure file (Ctrl+O)">
@@ -95,11 +95,38 @@
 
             <!-- ================= BUILD ================= -->
             <div class="tab-body" data-body="build">
-                <details class="sec" open id="sec-crystal">
-                    <summary>Bulk crystal <span class="tag">space group</span></summary>
-                    <div class="sec-body">
-                        <label class="field"><span>Preset</span>
-                            <select id="cr-preset"></select></label>
+                <div class="source-bar">
+                    <span class="source-dot" aria-hidden="true"></span>
+                    <div>
+                        <span class="source-label">Source crystal</span>
+                        <b id="src-name">–</b>
+                        <span class="source-meta" id="src-meta"></span>
+                    </div>
+                    <button class="btn small" id="src-use" title="Use the structure in the viewer as the source for slabs, boundaries, particles and polycrystals">Use current</button>
+                </div>
+
+                <div class="builder-tiles" role="group" aria-label="Builders">
+                    <button type="button" data-open="crystal" aria-pressed="true"><svg viewBox="0 0 24 24"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M12 12l8-4.5M12 12v9M12 12L4 7.5"/></svg><span>Crystal</span></button>
+                    <button type="button" data-open="transform" aria-pressed="false"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg><span>Supercell</span></button>
+                    <button type="button" data-open="slab" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M3 15l9 4 9-4M3 11l9 4 9-4M3 7l9-4 9 4-9 4z"/></svg><span>Slab</span></button>
+                    <button type="button" data-open="gb" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M12 3v18"/><path d="M4 6l4 3M4 11l4 3M4 16l4 3M20 6l-4 3M20 11l-4 3M20 16l-4 3"/></svg><span>Grain boundary</span></button>
+                    <button type="button" data-open="nano" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M12 2l7 4v8l-7 8-7-8V6z"/><path d="M5 6l7 4 7-4M12 10v12"/></svg><span>Nanoparticle</span></button>
+                    <button type="button" data-open="poly" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M3 3h18v18H3z"/><path d="M3 10l6-2 3-5M9 8l3 7 9-2M12 15l-3 6M12 15l-9-1"/></svg><span>Polycrystal</span></button>
+                    <button type="button" data-open="amorphous" aria-pressed="false"><svg viewBox="0 0 24 24"><circle cx="6" cy="7" r="2"/><circle cx="15" cy="5" r="2"/><circle cx="18" cy="13" r="2"/><circle cx="9" cy="15" r="2"/><circle cx="5" cy="20" r="1.3"/><circle cx="14" cy="20" r="1.3"/><circle cx="11" cy="9.5" r="1.3"/></svg><span>Amorphous</span></button>
+                    <button type="button" data-open="sf" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M3 5h12M3 10h12M7 15h14M7 20h14"/><path d="M17 8l3 2-3 2"/></svg><span>Stacking fault</span></button>
+                    <button type="button" data-open="ss" aria-pressed="false"><svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.2"/><circle cx="12" cy="6" r="2.2" class="fill"/><circle cx="18" cy="6" r="2.2"/><circle cx="6" cy="12" r="2.2" class="fill"/><circle cx="12" cy="12" r="2.2"/><circle cx="18" cy="12" r="2.2"/><circle cx="6" cy="18" r="2.2"/><circle cx="12" cy="18" r="2.2"/><circle cx="18" cy="18" r="2.2" class="fill"/></svg><span>Solid solution</span></button>
+                </div>
+
+                <!-- Bulk crystal -->
+                <details class="card" data-card="crystal" open>
+                    <summary>
+                        <span class="card-ico"><svg viewBox="0 0 24 24"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M12 12l8-4.5M12 12v9M12 12L4 7.5"/></svg></span>
+                        <span class="card-title"><b>Bulk crystal</b><small>Any of the 230 space groups</small></span>
+                    </summary>
+                    <div class="card-body">
+                        <div class="preview"><canvas aria-label="Preview"></canvas><div class="preview-cap"></div><span class="preview-hint">drag to rotate</span></div>
+                        <label class="field"><span>Preset</span><select id="cr-preset"></select></label>
+                        <div class="group-title">Symmetry</div>
                         <div class="row c2">
                             <label class="field"><span>Crystal system</span>
                                 <select id="cr-system">
@@ -111,73 +138,86 @@
                                     <option value="hexagonal">Hexagonal</option>
                                     <option value="cubic" selected>Cubic</option>
                                 </select></label>
-                            <label class="field"><span>Space group</span>
-                                <select id="cr-sg"></select></label>
+                            <label class="field"><span>Space group</span><select id="cr-sg"></select></label>
                         </div>
                         <label class="field"><span>Setting</span><select id="cr-setting"></select></label>
+                        <div class="group-title">Lattice</div>
                         <div class="row c3">
-                            <label class="field"><span>a (Å)</span><input type="number" step="0.001" id="cr-a"></label>
-                            <label class="field"><span>b (Å)</span><input type="number" step="0.001" id="cr-b"></label>
-                            <label class="field"><span>c (Å)</span><input type="number" step="0.001" id="cr-c"></label>
-                            <label class="field"><span>α (°)</span><input type="number" step="0.01" id="cr-al"></label>
-                            <label class="field"><span>β (°)</span><input type="number" step="0.01" id="cr-be"></label>
-                            <label class="field"><span>γ (°)</span><input type="number" step="0.01" id="cr-ga"></label>
+                            <label class="field unit" data-unit="Å"><span>a</span><input type="number" step="0.001" id="cr-a"></label>
+                            <label class="field unit" data-unit="Å"><span>b</span><input type="number" step="0.001" id="cr-b"></label>
+                            <label class="field unit" data-unit="Å"><span>c</span><input type="number" step="0.001" id="cr-c"></label>
+                            <label class="field unit" data-unit="°"><span>α</span><input type="number" step="0.01" id="cr-al"></label>
+                            <label class="field unit" data-unit="°"><span>β</span><input type="number" step="0.01" id="cr-be"></label>
+                            <label class="field unit" data-unit="°"><span>γ</span><input type="number" step="0.01" id="cr-ga"></label>
                         </div>
-                        <div>
-                            <div class="table" id="cr-sites"></div>
-                            <button class="link-btn" id="cr-add-site">+ Add site</button>
-                        </div>
-                        <p class="note" id="cr-note">Symmetry-equivalent positions are generated from the
-                            asymmetric unit.</p>
-                        <button class="btn primary block" id="cr-build">Build crystal</button>
+                        <div class="group-title">Sites <span>fractional, e.g. 1/3</span></div>
+                        <div class="table" id="cr-sites"></div>
+                        <button type="button" class="link-btn" id="cr-add-site">+ Add site</button>
+                        <button class="btn primary block" id="cr-build" data-build>Build crystal</button>
                     </div>
                 </details>
 
-                <details class="sec" id="sec-supercell">
-                    <summary>Supercell &amp; transformation</summary>
-                    <div class="sec-body">
-                        <div class="row c4">
-                            <label class="field"><span>n<sub>a</sub></span><input type="number" min="1" value="2" id="sc-a"></label>
-                            <label class="field"><span>n<sub>b</sub></span><input type="number" min="1" value="2" id="sc-b"></label>
-                            <label class="field"><span>n<sub>c</sub></span><input type="number" min="1" value="2" id="sc-c"></label>
-                            <button class="btn" id="sc-apply">Apply</button>
-                        </div>
-                        <p class="note">General transformation: new cell rows = P · (a, b, c).</p>
+                <!-- Supercell & transformation -->
+                <details class="card" data-card="transform">
+                    <summary>
+                        <span class="card-ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg></span>
+                        <span class="card-title"><b>Supercell &amp; transformation</b><small>Acts on the current structure</small></span>
+                    </summary>
+                    <div class="card-body">
+                        <div class="preview"><canvas aria-label="Preview"></canvas><div class="preview-cap"></div><span class="preview-hint">drag to rotate</span></div>
+                        <div class="group-title">Cell transformation <span>new rows = P · (a, b, c)</span></div>
                         <div class="matrix" id="tm">
-                            <input value="1"><input value="0"><input value="0">
-                            <input value="0"><input value="1"><input value="0">
-                            <input value="0"><input value="0"><input value="1">
+                            <input value="1" aria-label="P11"><input value="0" aria-label="P12"><input value="0" aria-label="P13">
+                            <input value="0" aria-label="P21"><input value="1" aria-label="P22"><input value="0" aria-label="P23">
+                            <input value="0" aria-label="P31"><input value="0" aria-label="P32"><input value="1" aria-label="P33">
                         </div>
                         <div class="row c2">
-                            <button class="btn" id="tm-prim">Primitive (F/I)…</button>
-                            <button class="btn" id="tm-apply">Transform</button>
+                            <button type="button" class="btn" id="tm-prim">Primitive cell</button>
+                            <button type="button" class="btn" id="tm-reset">Identity</button>
                         </div>
+                        <div class="group-title">Repeats</div>
+                        <div class="row c3">
+                            <label class="field"><span>× a</span><input type="number" min="1" value="2" id="sc-a"></label>
+                            <label class="field"><span>× b</span><input type="number" min="1" value="2" id="sc-b"></label>
+                            <label class="field"><span>× c</span><input type="number" min="1" value="2" id="sc-c"></label>
+                        </div>
+                        <button class="btn primary block" id="sc-apply" data-build>Apply</button>
                     </div>
                 </details>
 
-                <details class="sec" id="sec-slab">
-                    <summary>Surface slab <span class="tag">(hkl)</span></summary>
-                    <div class="sec-body">
-                        <p class="note">Cut from the current crystal.</p>
+                <!-- Surface slab -->
+                <details class="card" data-card="slab">
+                    <summary>
+                        <span class="card-ico"><svg viewBox="0 0 24 24"><path d="M3 15l9 4 9-4M3 11l9 4 9-4M3 7l9-4 9 4-9 4z"/></svg></span>
+                        <span class="card-title"><b>Surface slab</b><small>Any (hkl) with vacuum</small></span>
+                    </summary>
+                    <div class="card-body">
+                        <div class="preview"><canvas aria-label="Preview"></canvas><div class="preview-cap"></div><span class="preview-hint">drag to rotate</span></div>
+                        <div class="group-title">Miller indices</div>
                         <div class="row c3">
                             <label class="field"><span>h</span><input type="number" value="1" id="sl-h"></label>
                             <label class="field"><span>k</span><input type="number" value="1" id="sl-k"></label>
                             <label class="field"><span>l</span><input type="number" value="1" id="sl-l"></label>
                         </div>
-                        <div class="row c3">
+                        <div class="group-title">Size</div>
+                        <div class="row c2">
                             <label class="field"><span>Layers</span><input type="number" min="1" value="4" id="sl-layers"></label>
-                            <label class="field"><span>Vacuum (Å)</span><input type="number" min="0" value="12" id="sl-vac"></label>
-                            <label class="field"><span>In-plane</span><input type="text" value="1 1" id="sl-rep" title="Lateral repeats, e.g. 3 3"></label>
+                            <label class="field unit" data-unit="Å"><span>Vacuum</span><input type="number" min="0" value="12" id="sl-vac"></label>
+                            <label class="field"><span>× a (in plane)</span><input type="number" min="1" value="2" id="sl-ra"></label>
+                            <label class="field"><span>× b (in plane)</span><input type="number" min="1" value="2" id="sl-rb"></label>
                         </div>
-                        <button class="btn primary block" id="sl-build">Build slab</button>
+                        <button class="btn primary block" id="sl-build" data-build>Build slab</button>
                     </div>
                 </details>
 
-                <details class="sec" id="sec-gb">
-                    <summary>Grain boundary <span class="tag">CSL tilt</span></summary>
-                    <div class="sec-body">
-                        <p class="note">Symmetric tilt boundaries in cubic crystals. Uses the current cubic crystal
-                            (conventional cell).</p>
+                <!-- Grain boundary -->
+                <details class="card" data-card="gb">
+                    <summary>
+                        <span class="card-ico"><svg viewBox="0 0 24 24"><path d="M12 3v18"/><path d="M4 6l4 3M4 11l4 3M4 16l4 3M20 6l-4 3M20 11l-4 3M20 16l-4 3"/></svg></span>
+                        <span class="card-title"><b>Grain boundary</b><small>Symmetric tilt CSL bicrystal (cubic)</small></span>
+                    </summary>
+                    <div class="card-body">
+                        <div class="preview"><canvas aria-label="Preview"></canvas><div class="preview-cap"></div><span class="preview-hint">drag to rotate</span></div>
                         <div class="row c2">
                             <label class="field"><span>Tilt axis</span>
                                 <select id="gb-axis">
@@ -188,98 +228,160 @@
                                 </select></label>
                             <label class="field"><span>Max Σ</span><input type="number" value="51" id="gb-maxsig"></label>
                         </div>
-                        <div class="gb-list" id="gb-list"></div>
+                        <div class="gb-list" id="gb-list" aria-label="Boundaries"></div>
+                        <div class="group-title">Grain size <span>repeats of the oriented cell</span></div>
                         <div class="row c3">
-                            <label class="field"><span>Grain ⊥</span><input type="number" min="1" value="3" id="gb-n1" title="Repeats normal to the boundary"></label>
+                            <label class="field"><span>Normal</span><input type="number" min="1" value="3" id="gb-n1"></label>
                             <label class="field"><span>In plane</span><input type="number" min="1" value="1" id="gb-n2"></label>
                             <label class="field"><span>Along axis</span><input type="number" min="1" value="2" id="gb-n3"></label>
                         </div>
+                        <div class="group-title">Grain 2 translation &amp; overlap</div>
                         <div class="row c3">
-                            <label class="field"><span>Shift y (frac)</span><input type="number" step="0.05" value="0" id="gb-sy"></label>
-                            <label class="field"><span>Shift z (frac)</span><input type="number" step="0.05" value="0" id="gb-sz"></label>
+                            <label class="field"><span>Shift y</span><input type="number" step="0.05" value="0" id="gb-sy" title="Fraction of the in-plane period"></label>
+                            <label class="field"><span>Shift z</span><input type="number" step="0.05" value="0" id="gb-sz" title="Fraction of the period along the axis"></label>
                             <label class="field"><span>Overlap</span><input type="number" step="0.05" value="0.7" id="gb-ov" title="Remove atoms closer than this × nearest-neighbour distance"></label>
                         </div>
-                        <button class="btn primary block" id="gb-build">Build bicrystal</button>
+                        <button class="btn primary block" id="gb-build" data-build>Build bicrystal</button>
                     </div>
                 </details>
 
-                <details class="sec" id="sec-nano">
-                    <summary>Nanoparticle <span class="tag">shape · Wulff</span></summary>
-                    <div class="sec-body">
+                <!-- Nanoparticle -->
+                <details class="card" data-card="nano">
+                    <summary>
+                        <span class="card-ico"><svg viewBox="0 0 24 24"><path d="M12 2l7 4v8l-7 8-7-8V6z"/><path d="M5 6l7 4 7-4M12 10v12"/></svg></span>
+                        <span class="card-title"><b>Nanoparticle</b><small>Geometric shapes or Wulff construction</small></span>
+                    </summary>
+                    <div class="card-body">
+                        <div class="preview"><canvas aria-label="Preview"></canvas><div class="preview-cap"></div><span class="preview-hint">drag to rotate</span></div>
                         <div class="seg" id="np-mode">
-                            <button aria-pressed="true" data-v="shape">Shape</button>
-                            <button aria-pressed="false" data-v="wulff">Wulff construction</button>
+                            <button type="button" aria-pressed="true" data-v="shape">Shape</button>
+                            <button type="button" aria-pressed="false" data-v="wulff">Wulff construction</button>
                         </div>
-                        <div id="np-shape-opts" class="sec-body" style="padding:0">
+                        <div id="np-shape-opts" class="stack">
                             <label class="field"><span>Shape</span><select id="np-shape"></select></label>
                             <div class="row c3">
-                                <label class="field"><span>Radius (Å)</span><input type="number" value="12" id="np-r"></label>
-                                <label class="field"><span>Height (Å)</span><input type="number" value="24" id="np-h"></label>
-                                <label class="field"><span>R<sub>y</sub> (Å)</span><input type="number" value="8" id="np-ry"></label>
+                                <label class="field unit" data-unit="Å"><span>Radius</span><input type="number" value="12" id="np-r"></label>
+                                <label class="field unit" data-unit="Å"><span>Height</span><input type="number" value="24" id="np-h" title="Cylinder height, or 2× the z semi-axis of an ellipsoid"></label>
+                                <label class="field unit" data-unit="Å"><span>R<sub>y</sub></span><input type="number" value="8" id="np-ry" title="Ellipsoid y semi-axis"></label>
                             </div>
                         </div>
-                        <div id="np-wulff-opts" class="sec-body" style="padding:0" hidden>
-                            <label class="field"><span>Size: distance to lowest-energy facet (Å)</span><input type="number" value="14" id="wf-r"></label>
+                        <div id="np-wulff-opts" class="stack" hidden>
+                            <label class="field unit" data-unit="Å"><span>Distance to the lowest-energy facet</span><input type="number" value="14" id="wf-r"></label>
+                            <div class="group-title">Facet families <span>relative surface energies γ</span></div>
                             <div class="table facets" id="wf-facets"></div>
-                            <button class="link-btn" id="wf-add">+ Add facet family</button>
-                            <label class="check"><input type="checkbox" id="wf-cubic" checked> Apply cubic symmetry to families</label>
+                            <button type="button" class="link-btn" id="wf-add">+ Add facet family</button>
+                            <label class="check"><input type="checkbox" id="wf-cubic" checked> Expand families with cubic symmetry</label>
                         </div>
                         <div class="row c2">
                             <label class="field"><span>Centre on</span>
                                 <select id="np-center"><option value="atom">An atom</option><option value="void">Cell centre</option></select></label>
-                            <label class="field"><span>Vacuum (Å)</span><input type="number" value="8" id="np-vac"></label>
+                            <label class="field unit" data-unit="Å"><span>Vacuum</span><input type="number" value="8" id="np-vac"></label>
                         </div>
-                        <button class="btn primary block" id="np-build">Build nanoparticle</button>
+                        <button class="btn primary block" id="np-build" data-build>Build nanoparticle</button>
                     </div>
                 </details>
 
-                <details class="sec" id="sec-poly">
-                    <summary>Polycrystal <span class="tag">Voronoi</span></summary>
-                    <div class="sec-body">
-                        <p class="note">Randomly oriented grains of the current crystal in a periodic box.</p>
+                <!-- Polycrystal -->
+                <details class="card" data-card="poly">
+                    <summary>
+                        <span class="card-ico"><svg viewBox="0 0 24 24"><path d="M3 3h18v18H3z"/><path d="M3 10l6-2 3-5M9 8l3 7 9-2M12 15l-3 6M12 15l-9-1"/></svg></span>
+                        <span class="card-title"><b>Polycrystal</b><small>Voronoi grains, random orientations</small></span>
+                    </summary>
+                    <div class="card-body">
+                        <div class="preview"><canvas aria-label="Preview"></canvas><div class="preview-cap"></div><span class="preview-hint">drag to rotate</span></div>
+                        <div class="group-title">Box</div>
                         <div class="row c3">
-                            <label class="field"><span>L<sub>x</sub> (Å)</span><input type="number" value="50" id="pc-x"></label>
-                            <label class="field"><span>L<sub>y</sub> (Å)</span><input type="number" value="50" id="pc-y"></label>
-                            <label class="field"><span>L<sub>z</sub> (Å)</span><input type="number" value="50" id="pc-z"></label>
+                            <label class="field unit" data-unit="Å"><span>L<sub>x</sub></span><input type="number" value="50" id="pc-x"></label>
+                            <label class="field unit" data-unit="Å"><span>L<sub>y</sub></span><input type="number" value="50" id="pc-y"></label>
+                            <label class="field unit" data-unit="Å"><span>L<sub>z</sub></span><input type="number" value="50" id="pc-z"></label>
                         </div>
+                        <div class="group-title">Grains</div>
                         <div class="row c3">
-                            <label class="field"><span>Grains</span><input type="number" min="2" value="8" id="pc-n"></label>
+                            <label class="field"><span>Number</span><input type="number" min="1" value="8" id="pc-n"></label>
                             <label class="field"><span>Seed</span><input type="number" value="1" id="pc-seed"></label>
-                            <label class="field"><span>Overlap</span><input type="number" step="0.05" value="0.7" id="pc-ov"></label>
+                            <label class="field"><span>Overlap</span><input type="number" step="0.05" value="0.7" id="pc-ov" title="Remove atoms closer than this × nearest-neighbour distance"></label>
                         </div>
-                        <button class="btn primary block" id="pc-build">Build polycrystal</button>
+                        <button class="btn primary block" id="pc-build" data-build>Build polycrystal</button>
                     </div>
                 </details>
 
-                <details class="sec" id="sec-sf">
-                    <summary>Stacking fault <span class="tag">FCC · GSFE</span></summary>
-                    <div class="sec-body">
-                        <p class="note">(111) stacking with the upper half displaced along [11-2]. Uses the current FCC
-                            crystal.</p>
-                        <div class="range"><span>Displacement u (units of b<sub>p</sub> = a/√6)</span>
+                <!-- Amorphous -->
+                <details class="card" data-card="amorphous">
+                    <summary>
+                        <span class="card-ico"><svg viewBox="0 0 24 24"><circle cx="6" cy="7" r="2"/><circle cx="15" cy="5" r="2"/><circle cx="18" cy="13" r="2"/><circle cx="9" cy="15" r="2"/><circle cx="5" cy="20" r="1.3"/><circle cx="14" cy="20" r="1.3"/><circle cx="11" cy="9.5" r="1.3"/></svg></span>
+                        <span class="card-title"><b>Amorphous</b><small>Random packing at a target density</small></span>
+                    </summary>
+                    <div class="card-body">
+                        <div class="preview"><canvas aria-label="Preview"></canvas><div class="preview-cap"></div><span class="preview-hint">drag to rotate</span></div>
+                        <div class="group-title">Composition</div>
+                        <div class="table two" id="am-comp"></div>
+                        <button type="button" class="link-btn" id="am-add-el">+ Add element</button>
+                        <div class="group-title">Box</div>
+                        <div class="seg" id="am-mode">
+                            <button type="button" aria-pressed="true" data-v="density">From density</button>
+                            <button type="button" aria-pressed="false" data-v="manual">Manual size</button>
+                        </div>
+                        <div id="am-density-opts" class="stack">
+                            <label class="field unit" data-unit="g/cm³"><span>Target density</span><input type="number" step="0.05" value="2.2" id="am-density"></label>
+                            <p class="note" id="am-box-hint"></p>
+                        </div>
+                        <div id="am-manual-opts" class="row c3" hidden>
+                            <label class="field unit" data-unit="Å"><span>a</span><input type="number" value="15" id="am-a"></label>
+                            <label class="field unit" data-unit="Å"><span>b</span><input type="number" value="15" id="am-b"></label>
+                            <label class="field unit" data-unit="Å"><span>c</span><input type="number" value="15" id="am-c"></label>
+                        </div>
+                        <div class="group-title">Packing</div>
+                        <div class="row c2">
+                            <label class="field"><span>Box scale factor</span><input type="number" step="0.05" value="1" id="am-scale" title="Values above 1 make placement easier"></label>
+                            <label class="field"><span>Covalent tolerance</span><input type="number" step="0.05" value="0.75" id="am-tol" title="Default minimum distance = tolerance × (r_i + r_j)"></label>
+                            <label class="field"><span>Seed</span><input type="number" value="42" id="am-seed"></label>
+                            <label class="field"><span>Attempts per atom</span><input type="number" value="1000" id="am-attempts"></label>
+                        </div>
+                        <div class="group-title">Minimum distances <span>override the covalent default</span></div>
+                        <div class="table two" id="am-pairs"></div>
+                        <button type="button" class="link-btn" id="am-add-pair">+ Add pair</button>
+                        <button class="btn primary block" id="am-build" data-build>Build amorphous structure</button>
+                    </div>
+                </details>
+
+                <!-- Stacking fault -->
+                <details class="card" data-card="sf">
+                    <summary>
+                        <span class="card-ico"><svg viewBox="0 0 24 24"><path d="M3 5h12M3 10h12M7 15h14M7 20h14"/><path d="M17 8l3 2-3 2"/></svg></span>
+                        <span class="card-title"><b>Stacking fault</b><small>FCC generalised stacking-fault path</small></span>
+                    </summary>
+                    <div class="card-body">
+                        <div class="preview"><canvas aria-label="Preview"></canvas><div class="preview-cap"></div><span class="preview-hint">drag to rotate</span></div>
+                        <div class="range"><span>Displacement u (units of b<sub>p</sub> = a/√6 along [11-2])</span>
                             <input type="range" min="0" max="2" step="0.05" value="1" id="sf-u"><output id="sf-u-out">1.00</output></div>
                         <div class="seg" id="sf-presets">
-                            <button data-u="0" aria-pressed="false">Perfect</button>
-                            <button data-u="0.5" aria-pressed="false">Unstable</button>
-                            <button data-u="1" aria-pressed="true">Intrinsic</button>
+                            <button type="button" data-u="0" aria-pressed="false">Perfect</button>
+                            <button type="button" data-u="0.5" aria-pressed="false">Unstable</button>
+                            <button type="button" data-u="1" aria-pressed="true">Intrinsic</button>
                         </div>
+                        <div class="group-title">Cell repeats</div>
                         <div class="row c3">
                             <label class="field"><span>[1-10]</span><input type="number" min="1" value="2" id="sf-nx"></label>
                             <label class="field"><span>[11-2]</span><input type="number" min="1" value="1" id="sf-ny"></label>
                             <label class="field"><span>[111]</span><input type="number" min="2" value="4" id="sf-nz"></label>
                         </div>
-                        <button class="btn primary block" id="sf-build">Build stacking fault</button>
+                        <button class="btn primary block" id="sf-build" data-build>Build stacking fault</button>
                     </div>
                 </details>
 
-                <details class="sec" id="sec-ss">
-                    <summary>Solid solution <span class="tag">random</span></summary>
-                    <div class="sec-body">
+                <!-- Solid solution -->
+                <details class="card" data-card="ss">
+                    <summary>
+                        <span class="card-ico"><svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.2"/><circle cx="12" cy="6" r="2.2" class="fill"/><circle cx="18" cy="6" r="2.2"/><circle cx="6" cy="12" r="2.2" class="fill"/><circle cx="12" cy="12" r="2.2"/><circle cx="18" cy="12" r="2.2"/><circle cx="6" cy="18" r="2.2"/><circle cx="12" cy="18" r="2.2"/><circle cx="18" cy="18" r="2.2" class="fill"/></svg></span>
+                        <span class="card-title"><b>Solid solution</b><small>Random substitution in the current structure</small></span>
+                    </summary>
+                    <div class="card-body">
+                        <div class="preview"><canvas aria-label="Preview"></canvas><div class="preview-cap"></div><span class="preview-hint">drag to rotate</span></div>
                         <label class="field"><span>Host species</span><select id="ss-host"></select></label>
-                        <div class="table solutes" id="ss-solutes"></div>
-                        <button class="link-btn" id="ss-add">+ Add solute</button>
+                        <div class="table two" id="ss-solutes"></div>
+                        <button type="button" class="link-btn" id="ss-add">+ Add solute</button>
                         <label class="field"><span>Random seed</span><input type="number" value="1" id="ss-seed"></label>
-                        <button class="btn primary block" id="ss-build">Substitute</button>
+                        <button class="btn primary block" id="ss-build" data-build>Substitute</button>
                     </div>
                 </details>
             </div>
@@ -558,7 +660,7 @@
     </footer>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-    <script type="module" src="dist/structure_studio/app.js"></script>
+    <script type="module" src="dist/structure_studio/main.js"></script>
 </body>
 
 </html>
