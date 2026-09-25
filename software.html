@@ -7,13 +7,13 @@
     <title>Software · Albert Linda</title>
     <meta name="description"
         content="Research software by Albert Linda for atomistic modelling, DFT workflows, phase-field simulation and machine learning in materials science.">
-    <link rel="icon" href="resources/images/favicon.jpg">
+    <link rel="icon" href="images/favicon.jpg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
     <script>document.documentElement.classList.add('js');</script>
-    <link rel="stylesheet" href="style/site.css">
+    <link rel="stylesheet" href="css/site.css">
 </head>
 
 <body class="site">
@@ -24,6 +24,8 @@
                 <a href="index.html">About</a>
                 <a href="publications.html">Publications</a>
                 <a href="software.html" aria-current="page">Software</a>
+                <a href="atomforge.html">AtomForge Web</a>
+                <a href="phasefield.html">Phase-Field Lab</a>
             </nav>
         </div>
     </header>
@@ -104,7 +106,7 @@
         <p>These run entirely in your browser; files are not uploaded anywhere.</p>
         <ul class="projects" data-reveal-stagger>
             <li>
-                <a class="name" href="loader.html">AtomForge Web</a><span class="meta">browser port of AtomForge · three.js</span>
+                <a class="name" href="atomforge.html">AtomForge Web</a><span class="meta">browser port of AtomForge · three.js</span>
                 <p>Build crystals from any of the 230 space groups, then cut surface slabs, CSL tilt grain
                     boundaries, nanoparticles (shapes or Wulff constructions), Voronoi polycrystals, amorphous
                     structures, FCC stacking faults and random solid solutions, each with a live preview. Edit atoms and cells with undo, measure distances and angles,
@@ -116,12 +118,12 @@
                 <p>Converts an ATAT <code>bestsqs.out</code> file to a VASP POSCAR.</p>
             </li>
             <li>
-                <a class="name" href="grain_growth.html">Isotropic grain growth</a>
-                <p>A 2D multi-order-parameter phase-field simulation of grain coarsening.</p>
-            </li>
-            <li>
-                <a class="name" href="spinodal.html">Spinodal decomposition</a>
-                <p>A 2D Cahn–Hilliard simulation of phase separation.</p>
+                <a class="name" href="phasefield.html">Phase-Field Lab</a><span class="meta">3D · WebGPU</span>
+                <p>Ten 3D phase-field models running on the GPU in the browser: spinodal decomposition, grain
+                    growth, precipitation and coarsening, a multi-phase-field model, magnetic domains (LLG with DMI),
+                    dendritic solidification, block-copolymer self-assembly, nucleation and growth, antiphase
+                    domains and Swift–Hohenberg patterns. Rendered as surfaces, volumes or isosurfaces, with a 2D
+                    slice along any plane and export to ParaView (VTK).</p>
             </li>
         </ul>
     </main>
@@ -137,7 +139,7 @@
             </span>
         </div>
     </footer>
-    <script src="dist/site.js"></script>
+    <script src="js/site.js"></script>
 </body>
 
 </html>

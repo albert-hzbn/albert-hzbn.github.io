@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Phase-Field Lab · Albert Linda</title>
+    <meta name="description"
+        content="3D phase-field simulations on the GPU in the browser: spinodal decomposition, grain growth, precipitation, multi-phase field, magnetic domains, dendrites and more, with arbitrary slicing.">
+    <link rel="icon" href="images/favicon.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,600&display=swap">
+    <script>
+        (function () {
+            let t = null;
+            try { t = localStorage.getItem('studio-theme'); } catch (e) { }
+            if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.dataset.theme = t;
+        })();
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/tools.css">
+    <link rel="stylesheet" href="css/phasefield.css">
+</head>
+
+<body class="studio pf">
+    <header class="topbar">
+        <button class="btn icon ghost panel-toggle" id="panel-toggle" aria-label="Show tools panel">
+            <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
+        </button>
+        <a class="home-link" href="index.html" title="Albert Linda · home">Albert Linda</a>
+        <nav class="app-tabs" aria-label="Web tools">
+            <a href="atomforge.html"><b>AtomForge</b><span> Web</span></a>
+            <a href="phasefield.html" aria-current="page"><b>Phase-Field</b><span> Lab</span></a>
+        </nav>
+
+        <div class="transport" role="group" aria-label="Simulation">
+            <button class="btn icon" id="btn-reset" title="Reset to the initial state (R)" aria-label="Reset">
+                <svg viewBox="0 0 24 24"><path d="M4 4v6h6" /><path d="M5.5 15a7 7 0 1 0 1.6-7.3L4 10" /></svg>
+            </button>
+            <button class="btn run" id="btn-run" title="Run or pause (Space)" aria-pressed="false">
+                <svg viewBox="0 0 24 24" class="i-play"><path d="M7 5l12 7-12 7z" /></svg>
+                <svg viewBox="0 0 24 24" class="i-pause"><path d="M8 5v14M16 5v14" /></svg>
+                <span>Run</span>
+            </button>
+            <button class="btn icon" id="btn-step" title="Advance one batch of steps (S)" aria-label="Step">
+                <svg viewBox="0 0 24 24"><path d="M6 5l9 7-9 7zM18 5v14" /></svg>
+            </button>
+            <label class="speed" title="Time steps per frame">
+                <select id="speed">
+                    <option value="auto" selected>Auto speed</option>
+                    <option value="1">1 step / frame</option>
+                    <option value="5">5 steps / frame</option>
+                    <option value="20">20 steps / frame</option>
+                    <option value="50">50 steps / frame</option>
+                    <option value="100">100 steps / frame</option>
+                    <option value="250">250 steps / frame</option>
+                </select>
+            </label>
+        </div>
+
+        <div class="toolbar">
+            <div class="seg layout-seg tb-hide-sm" id="layout" role="group" aria-label="Layout">
+                <button type="button" data-v="3d" aria-pressed="false">3D</button>
+                <button type="button" data-v="split" aria-pressed="true">Split</button>
+                <button type="button" data-v="slice" aria-pressed="false">Slice</button>
+            </div>
+            <div class="menu" id="menu-export">
+                <button class="btn" data-menu>
+                    <svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14" /></svg>
+                    <span class="tb-hide-sm">Export</span>
+                </button>
+                <div class="menu-list">
+                    <div class="menu-title">Images</div>
+                    <button data-export="png3d">3D view <span class="hint">.png</span></button>
+                    <button data-export="pngslice">Slice <span class="hint">.png</span></button>
+                    <hr>
+                    <div class="menu-title">Data</div>
+                    <button data-export="vtk">Fields for ParaView <span class="hint">.vtk</span></button>
+                    <button data-export="slicecsv">Slice values <span class="hint">.csv</span></button>
+                </div>
+            </div>
+            <span class="tb-sep"></span>
+            <button class="btn icon ghost" id="btn-theme" title="Light / dark" aria-label="Toggle dark mode">
+                <svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" /></svg>
+            </button>
+        </div>
+    </header>
+
+    <main class="workspace">
+        <aside class="panel" aria-label="Controls">
+            <nav class="tabs three" role="tablist">
+                <button role="tab" aria-selected="true" data-tab="model">Model</button>
+                <button role="tab" aria-selected="false" data-tab="display">Display</button>
+                <button role="tab" aria-selected="false" data-tab="slice">Slice</button>
+            </nav>
+
+            <!-- ================= MODEL ================= -->
+            <div class="tab-body" data-body="model">
+                <div class="builder-tiles model-tiles" id="model-tiles" role="group" aria-label="Model"></div>
+
+                <section class="card static" id="model-card">
+                    <div class="card-head">
+                        <span class="card-ico"><svg viewBox="0 0 24 24" id="model-icon"></svg></span>
+                        <span class="card-title"><b id="model-name">–</b><small id="model-short"></small></span>
+                    </div>
+                    <div class="card-body">
+                        <p class="note model-desc" id="model-desc"></p>
+                        <div class="equation" id="model-eq"></div>
+                        <div class="group-title">Presets</div>
+                        <div class="seg wrap" id="presets"></div>
+                        <div class="group-title">Grid &amp; initial state</div>
+                        <div class="row c2">
+                            <label class="field"><span>Grid (cells per edge)</span>
+                                <select id="grid">
+                                    <option value="48">48³</option>
+                                    <option value="64">64³</option>
+                                    <option value="96">96³</option>
+                                    <option value="128">128³</option>
+                                    <option value="160">160³</option>
+                                </select></label>
+                            <label class="field"><span>Random seed</span><input type="number" id="seed" value="1"></label>
+                        </div>
+                        <div class="init-fields" id="init-fields"></div>
+                        <p class="note" id="mem-note"></p>
+                        <button class="btn primary block" id="btn-apply">Reset with these settings</button>
+                        <div id="param-groups"></div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ================= DISPLAY ================= -->
+            <div class="tab-body" data-body="display" hidden>
+                <details class="sec" open>
+                    <summary>Field</summary>
+                    <div class="sec-body">
+                        <label class="field"><span>Show</span><select id="view"></select></label>
+                        <label class="field"><span>Colour map</span>
+                            <select id="cmap">
+                                <option value="0">Viridis</option>
+                                <option value="1">Magma</option>
+                                <option value="2">Turbo</option>
+                                <option value="3">Cool–warm</option>
+                                <option value="4">Copper</option>
+                                <option value="5">Grey</option>
+                            </select></label>
+                        <div class="cbar" id="cbar"><span id="cbar-lo"></span><i id="cbar-grad"></i><span id="cbar-hi"></span></div>
+                        <div class="row c3">
+                            <label class="field"><span>Min</span><input type="number" step="any" id="range-lo"></label>
+                            <label class="field"><span>Max</span><input type="number" step="any" id="range-hi"></label>
+                            <button class="btn" id="range-auto" title="Fit the colour range to the current data">Auto</button>
+                        </div>
+                    </div>
+                </details>
+                <details class="sec" open>
+                    <summary>3D rendering</summary>
+                    <div class="sec-body">
+                        <div class="seg" id="render-mode">
+                            <button type="button" data-v="surface" aria-pressed="true">Surfaces</button>
+                            <button type="button" data-v="volume" aria-pressed="false">Volume</button>
+                            <button type="button" data-v="iso" aria-pressed="false">Isosurface</button>
+                        </div>
+                        <div class="range" id="iso-row"><span>Iso level</span><input type="range" min="0.02" max="0.98" step="0.01" value="0.5" id="iso"><output id="iso-out">0.50</output></div>
+                        <div class="range" id="opacity-row"><span>Opacity</span><input type="range" min="0.05" max="2" step="0.05" value="0.6" id="opacity"><output id="opacity-out">0.60</output></div>
+                        <div class="range" id="gamma-row"><span>Contrast (γ)</span><input type="range" min="0.5" max="4" step="0.1" value="1.5" id="gamma"><output id="gamma-out">1.5</output></div>
+                        <div class="range"><span>Ray-march quality</span><input type="range" min="96" max="512" step="32" value="256" id="quality"><output id="quality-out">256</output></div>
+                        <label class="check"><input type="checkbox" id="show-box" checked> Box outline</label>
+                        <label class="check"><input type="checkbox" id="auto-rotate"> Auto-rotate</label>
+                        <div class="row c4 view-dirs">
+                            <button class="btn" data-look="x">+x</button>
+                            <button class="btn" data-look="y">+y</button>
+                            <button class="btn" data-look="z">+z</button>
+                            <button class="btn" data-look="iso">Iso</button>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ================= SLICE ================= -->
+            <div class="tab-body" data-body="slice" hidden>
+                <details class="sec" open>
+                    <summary>Slice plane</summary>
+                    <div class="sec-body">
+                        <div class="builder-tiles plane-tiles" id="plane-presets">
+                            <button type="button" data-n="0,0,1" aria-pressed="true"><b>XY</b><span>normal z</span></button>
+                            <button type="button" data-n="0,1,0" aria-pressed="false"><b>XZ</b><span>normal y</span></button>
+                            <button type="button" data-n="1,0,0" aria-pressed="false"><b>YZ</b><span>normal x</span></button>
+                            <button type="button" data-n="1,1,0" aria-pressed="false"><b>(110)</b><span>diagonal</span></button>
+                            <button type="button" data-n="1,1,1" aria-pressed="false"><b>(111)</b><span>body diagonal</span></button>
+                            <button type="button" data-n="1,2,3" aria-pressed="false"><b>(123)</b><span>general</span></button>
+                        </div>
+                        <div class="group-title">Normal <span>as Miller-like indices</span></div>
+                        <div class="row c4">
+                            <label class="field"><span>h</span><input type="number" step="any" value="0" id="pl-h"></label>
+                            <label class="field"><span>k</span><input type="number" step="any" value="0" id="pl-k"></label>
+                            <label class="field"><span>l</span><input type="number" step="any" value="1" id="pl-l"></label>
+                            <button class="btn" id="pl-apply">Set</button>
+                        </div>
+                        <div class="group-title">Orientation</div>
+                        <div class="range"><span>Polar angle θ (from z)</span><input type="range" min="0" max="180" step="0.5" value="0" id="pl-theta"><output id="pl-theta-out">0°</output></div>
+                        <div class="range"><span>Azimuth φ (from x)</span><input type="range" min="-180" max="180" step="0.5" value="0" id="pl-phi"><output id="pl-phi-out">0°</output></div>
+                        <div class="range"><span>Offset from centre (box units)</span><input type="range" min="-0.87" max="0.87" step="0.005" value="0" id="pl-d"><output id="pl-d-out">0.00</output></div>
+                        <p class="note" id="plane-note"></p>
+                    </div>
+                </details>
+                <details class="sec" open>
+                    <summary>In the 3D view</summary>
+                    <div class="sec-body">
+                        <label class="check"><input type="checkbox" id="show-plane" checked> Show the slice plane</label>
+                        <label class="check"><input type="checkbox" id="clip"> Cut the volume at the plane</label>
+                        <label class="check"><input type="checkbox" id="clip-flip"> Keep the other side</label>
+                        <button class="btn" id="look-normal">Look along the normal</button>
+                    </div>
+                </details>
+                <details class="sec" open>
+                    <summary>Slice view</summary>
+                    <div class="sec-body">
+                        <label class="check"><input type="checkbox" id="smooth" checked> Smooth interpolation</label>
+                        <p class="note">Scroll over the slice to move the plane; drag to tilt it.</p>
+                    </div>
+                </details>
+            </div>
+        </aside>
+
+        <section class="viewport pf-viewport" id="viewport" data-layout="split">
+            <div class="pane" id="pane3d">
+                <canvas id="c3d" aria-label="3D microstructure"></canvas>
+                <div class="pane-label"><b id="hud-model">–</b><span id="hud-view"></span></div>
+                <svg class="triad" id="triad" viewBox="-50 -50 100 100" aria-hidden="true"></svg>
+                <div class="hud-stats" id="hud-stats"></div>
+            </div>
+            <div class="pane" id="pane2d">
+                <canvas id="c2d" aria-label="2D slice"></canvas>
+                <div class="pane-label"><b>Slice</b><span id="slice-label"></span></div>
+                <div class="scalebar" id="scalebar"><i></i><span></span></div>
+            </div>
+            <div class="nogpu" id="nogpu" hidden>
+                <div>
+                    <h2>WebGPU is not available</h2>
+                    <p id="nogpu-msg">This simulator runs on the GPU through WebGPU. Use a recent Chrome, Edge or Opera (version 113 or later), Safari 18+, or Firefox 141+ on Windows, and make sure hardware acceleration is enabled.</p>
+                </div>
+            </div>
+            <div class="busy" id="busy"><div><div class="spinner"></div><span id="busy-text">Preparing…</span></div></div>
+        </section>
+    </main>
+
+    <footer class="statusbar">
+        <span id="st-model"></span>
+        <span><b id="st-step">0</b> steps</span>
+        <span>t = <b id="st-time">0</b></span>
+        <span id="st-rate"></span>
+        <span id="st-grid"></span>
+        <span class="hint" id="st-gpu"></span>
+    </footer>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script type="module" src="js/phasefield/main.js"></script>
+</body>
+
+</html>
