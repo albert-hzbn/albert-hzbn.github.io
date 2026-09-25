@@ -23,9 +23,15 @@
             <nav class="site-nav">
                 <a href="index.html">About</a>
                 <a href="publications.html">Publications</a>
-                <a href="software.html" aria-current="page">Software</a>
-                <a href="atomforge.html">AtomForge Web</a>
-                <a href="phasefield.html">Phase-Field Lab</a>
+                <a href="software.html">Software</a>
+                <div class="nav-drop">
+                    <a class="nav-drop-toggle" href="software.html#web-tools" aria-haspopup="true" aria-current="page">Web tools<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" /></svg></a>
+                    <div class="nav-menu">
+                        <a href="atomforge.html"><b>AtomForge Web</b><span>Build, edit and view atomic structures</span></a>
+                        <a href="phasefield.html"><b>Phase-Field Lab</b><span>3D microstructure simulations on the GPU</span></a>
+                        <a href="sqs_to_poscar.html"><b>SQS &rarr; POSCAR</b><span>Convert ATAT output for VASP</span></a>
+                    </div>
+                </div>
             </nav>
         </div>
     </header>
