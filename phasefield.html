@@ -4,9 +4,27 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Phase-Field Lab · Albert Linda</title>
-    <meta name="description"
-        content="3D phase-field simulations on the GPU in the browser: spinodal decomposition, grain growth, precipitation, multi-phase field, magnetic domains, dendrites and more, with arbitrary slicing.">
+    <title>Phase-Field Lab · 3D phase-field simulations in the browser</title>
+    <!-- seo -->
+    <meta name="description" content="Run 3D phase-field simulations on your GPU in the browser: spinodal decomposition, grain growth, precipitation, multi-phase field, magnetic domains, dendritic solidification and more, with slicing along any crystallographic plane.">
+    <meta name="author" content="Albert Linda">
+    <link rel="canonical" href="https://albertlinda.com/phasefield.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Albert Linda">
+    <meta property="og:title" content="Phase-Field Lab">
+    <meta property="og:description" content="Run 3D phase-field simulations on your GPU in the browser: spinodal decomposition, grain growth, precipitation, multi-phase field, magnetic domains, dendritic solidification and more, with slicing along any crystallographic plane.">
+    <meta property="og:url" content="https://albertlinda.com/phasefield.html">
+    <meta property="og:image" content="https://albertlinda.com/images/social/phasefield-lab.jpg">
+    <meta property="og:image:alt" content="Phase-Field Lab showing a 3D grain-growth simulation and a 2D slice">
+    <meta property="og:locale" content="en_GB">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Phase-Field Lab">
+    <meta name="twitter:description" content="Run 3D phase-field simulations on your GPU in the browser: spinodal decomposition, grain growth, precipitation, multi-phase field, magnetic domains, dendritic solidification and more, with slicing along any crystallographic plane.">
+    <meta name="twitter:image" content="https://albertlinda.com/images/social/phasefield-lab.jpg">
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"WebApplication","name":"Phase-Field Lab","url":"https://albertlinda.com/phasefield.html","applicationCategory":"ScientificApplication","operatingSystem":"Any","browserRequirements":"Requires a browser with WebGPU","image":"https://albertlinda.com/images/social/phasefield-lab.jpg","description":"Interactive 3D phase-field simulations running on the GPU with WebGPU.","featureList":["Spinodal decomposition (Cahn–Hilliard)","Grain growth (Fan–Chen)","Precipitation","Multi-phase field","Magnetic domains (LLG)","Dendritic solidification (Kobayashi)","Block copolymer (Ohta–Kawasaki)","Nucleation and growth","Antiphase domains (Allen–Cahn)","Swift–Hohenberg patterns","Slicing along arbitrary planes","VTK export"],"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"author":{"@type":"Person","name":"Albert Linda","url":"https://albertlinda.com/"}}
+    </script>
+    <!-- /seo -->
     <link rel="icon" href="images/favicon.jpg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,6 +44,7 @@
 </head>
 
 <body class="studio pf">
+    <h1 class="sr-only">Phase-Field Lab: 3D phase-field simulations on the GPU</h1>
     <header class="topbar">
         <button class="btn icon ghost panel-toggle" id="panel-toggle" aria-label="Show tools panel">
             <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" /></svg>

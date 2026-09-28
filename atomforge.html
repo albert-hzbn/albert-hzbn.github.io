@@ -4,9 +4,27 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AtomForge Web · Albert Linda</title>
-    <meta name="description"
-        content="Build, edit and visualise crystal structures in the browser: space-group crystals, slabs, grain boundaries, nanoparticles, polycrystals and stacking faults. Ported from AtomForge.">
+    <title>AtomForge Web · Online crystal structure builder and viewer</title>
+    <!-- seo -->
+    <meta name="description" content="Build, edit and visualise atomic structures in the browser: crystals from all 230 space groups, supercells, slabs, grain boundaries, Wulff nanoparticles, polycrystals, amorphous structures and stacking faults. Export VASP POSCAR, CIF, XYZ and LAMMPS files.">
+    <meta name="author" content="Albert Linda">
+    <link rel="canonical" href="https://albertlinda.com/atomforge.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Albert Linda">
+    <meta property="og:title" content="AtomForge Web">
+    <meta property="og:description" content="Build, edit and visualise atomic structures in the browser: crystals from all 230 space groups, supercells, slabs, grain boundaries, Wulff nanoparticles, polycrystals, amorphous structures and stacking faults. Export VASP POSCAR, CIF, XYZ and LAMMPS files.">
+    <meta property="og:url" content="https://albertlinda.com/atomforge.html">
+    <meta property="og:image" content="https://albertlinda.com/images/social/atomforge-web.jpg">
+    <meta property="og:image:alt" content="AtomForge Web showing a gold Wulff nanoparticle">
+    <meta property="og:locale" content="en_GB">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="AtomForge Web">
+    <meta name="twitter:description" content="Build, edit and visualise atomic structures in the browser: crystals from all 230 space groups, supercells, slabs, grain boundaries, Wulff nanoparticles, polycrystals, amorphous structures and stacking faults. Export VASP POSCAR, CIF, XYZ and LAMMPS files.">
+    <meta name="twitter:image" content="https://albertlinda.com/images/social/atomforge-web.jpg">
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"WebApplication","name":"AtomForge Web","url":"https://albertlinda.com/atomforge.html","applicationCategory":"ScientificApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript and WebGL","image":"https://albertlinda.com/images/social/atomforge-web.jpg","description":"Browser port of the AtomForge structure builder: crystals from space groups, slabs, grain boundaries, nanoparticles, polycrystals, amorphous structures and stacking faults, with editing and export.","isBasedOn":"https://github.com/albert-hzbn/AtomForge","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"author":{"@type":"Person","name":"Albert Linda","url":"https://albertlinda.com/"}}
+    </script>
+    <!-- /seo -->
     <link rel="icon" href="images/favicon.jpg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -33,6 +51,7 @@
 </head>
 
 <body class="studio">
+    <h1 class="sr-only">AtomForge Web: build, edit and visualise atomic structures</h1>
     <header class="topbar">
         <button class="btn icon ghost panel-toggle" id="panel-toggle" aria-label="Show tools panel">
             <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
