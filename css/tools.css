@@ -50,6 +50,7 @@ body.studio {
 body.studio {
     display: grid;
     grid-template-rows: auto 1fr auto;
+    grid-template-columns: minmax(0, 1fr);
     background: var(--app-bg);
     color: var(--ink);
     font-family: var(--sans);
@@ -949,6 +950,40 @@ select {
     }
 
     .statusbar .hint {
+        display: none;
+    }
+}
+
+/* Phones: keep the top bar within the screen width. */
+@media (max-width: 560px) {
+    .topbar {
+        gap: 6px;
+        padding: 0 8px;
+    }
+
+    .app-tabs {
+        min-width: 0;
+        flex-shrink: 1;
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+    .app-tabs a {
+        padding: 4px 7px;
+        font-size: 12px;
+    }
+
+    .transport {
+        gap: 4px;
+        margin-left: auto;
+    }
+
+    .btn.run {
+        padding: 0 10px;
+    }
+
+    .btn.run span,
+    #btn-step {
         display: none;
     }
 }

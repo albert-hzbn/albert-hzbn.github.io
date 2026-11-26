@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GPK Web · sharp-interface microstructure simulation in the browser</title>
+    <!-- seo -->
+    <meta name="description" content="Run GPK (Gaussian-projected kinetics) in the browser: sharp-interface 2D simulations of grain growth, recrystallisation, dendritic solidification, multiphase precipitation and Wulff shapes, with live statistics and input decks for the C++ code.">
+    <meta name="author" content="Albert Linda">
+    <link rel="canonical" href="https://albertlinda.com/gpk.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Albert Linda">
+    <meta property="og:title" content="GPK Web">
+    <meta property="og:description" content="Sharp-interface microstructure simulations in the browser: grain growth, recrystallisation, solidification, precipitation and Wulff shapes with Gaussian-projected kinetics.">
+    <meta property="og:url" content="https://albertlinda.com/gpk.html">
+    <meta property="og:image" content="https://albertlinda.com/images/portrait.jpg">
+    <meta property="og:locale" content="en_GB">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="GPK Web">
+    <meta name="twitter:description" content="Sharp-interface microstructure simulations in the browser with Gaussian-projected kinetics.">
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"WebApplication","name":"GPK Web","url":"https://albertlinda.com/gpk.html","applicationCategory":"ScientificApplication","operatingSystem":"Any","description":"Browser version of GPK, a sharp-interface framework for microstructure evolution based on Gaussian-projected kinetics.","featureList":["Grain growth with topology-certified label changes","Recrystallisation with site-saturated or continuous nucleation","Dendritic solidification with solute rejection","Multiphase precipitation with local Gibbs-energy phase selection","Wulff shape with tensor anisotropy","Export of GPK input decks"],"isBasedOn":"https://github.com/albert-hzbn/GPK","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"author":{"@type":"Person","name":"Albert Linda","url":"https://albertlinda.com/"}}
+    </script>
+    <!-- /seo -->
+    <link rel="icon" href="images/favicon.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,600&display=swap">
+    <script>
+        (function () {
+            let t = null;
+            try { t = localStorage.getItem('studio-theme'); } catch (e) { }
+            if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.dataset.theme = t;
+        })();
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/tools.css">
+    <link rel="stylesheet" href="css/phasefield.css">
+    <link rel="stylesheet" href="css/gpk.css">
+</head>
+
+<body class="studio pf gpk">
+    <h1 class="sr-only">GPK Web: sharp-interface microstructure simulation with Gaussian-projected kinetics</h1>
+    <header class="topbar">
+        <button class="btn icon ghost panel-toggle" id="panel-toggle" aria-label="Show tools panel">
+            <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
+        </button>
+        <a class="home-link" href="index.html" title="Albert Linda · home">Albert Linda</a>
+        <nav class="app-tabs" aria-label="Web tools">
+            <a href="atomforge.html"><b>AtomForge</b><span> Web</span></a>
+            <a href="phasefield.html"><b>Phase-Field</b><span> Lab</span></a>
+            <a href="gpk.html" aria-current="page"><b>GPK</b><span> Web</span></a>
+        </nav>
+
+        <div class="transport" role="group" aria-label="Simulation">
+            <button class="btn icon" id="btn-reset" title="Reset to the initial state (R)" aria-label="Reset">
+                <svg viewBox="0 0 24 24"><path d="M4 4v6h6" /><path d="M5.5 15a7 7 0 1 0 1.6-7.3L4 10" /></svg>
+            </button>
+            <button class="btn run" id="btn-run" title="Run or pause (Space)" aria-pressed="false">
+                <svg viewBox="0 0 24 24" class="i-play"><path d="M7 5l12 7-12 7z" /></svg>
+                <svg viewBox="0 0 24 24" class="i-pause"><path d="M8 5v14M16 5v14" /></svg>
+                <span>Run</span>
+            </button>
+            <button class="btn icon" id="btn-step" title="Advance ten steps (S)" aria-label="Step">
+                <svg viewBox="0 0 24 24"><path d="M6 5l9 7-9 7zM18 5v14" /></svg>
+            </button>
+            <label class="speed" title="Steps between screen updates">
+                <select id="speed">
+                    <option value="0" selected>Full speed</option>
+                    <option value="1">1 step / frame</option>
+                    <option value="5">5 steps / frame</option>
+                    <option value="20">20 steps / frame</option>
+                </select>
+            </label>
+        </div>
+
+        <div class="toolbar">
+            <div class="menu" id="menu-export">
+                <button class="btn" data-menu>
+                    <svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14" /></svg>
+                    <span class="tb-hide-sm">Export</span>
+                </button>
+                <div class="menu-list">
+                    <div class="menu-title">Images</div>
+                    <button data-export="png">Microstructure <span class="hint">.png</span></button>
+                    <button data-export="chartpng">Chart <span class="hint">.png</span></button>
+                    <hr>
+                    <div class="menu-title">Data</div>
+                    <button data-export="csv">Cell fields <span class="hint">.csv</span></button>
+                    <button data-export="history">Statistics over time <span class="hint">.csv</span></button>
+                    <hr>
+                    <div class="menu-title">GPK (C++)</div>
+                    <button data-export="ini">Input deck for these settings <span class="hint">.ini</span></button>
+                </div>
+            </div>
+            <span class="tb-sep"></span>
+            <button class="btn icon ghost" id="btn-theme" title="Light / dark" aria-label="Toggle dark mode">
+                <svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" /></svg>
+            </button>
+        </div>
+    </header>
+
+    <main class="workspace">
+        <aside class="panel" aria-label="Controls">
+            <nav class="tabs three" role="tablist">
+                <button role="tab" aria-selected="true" data-tab="model">Model</button>
+                <button role="tab" aria-selected="false" data-tab="display">Display</button>
+                <button role="tab" aria-selected="false" data-tab="about">Method</button>
+            </nav>
+
+            <!-- ================= MODEL ================= -->
+            <div class="tab-body" data-body="model">
+                <div class="builder-tiles model-tiles gpk-tiles" id="model-tiles" role="group" aria-label="Model"></div>
+
+                <section class="card static" id="model-card">
+                    <div class="card-head">
+                        <span class="card-ico"><svg viewBox="0 0 24 24" id="model-icon"></svg></span>
+                        <span class="card-title"><b id="model-name">–</b><small id="model-short"></small></span>
+                    </div>
+                    <div class="card-body">
+                        <p class="note model-desc" id="model-desc"></p>
+                        <div class="equation" id="model-eq"></div>
+                        <div class="group-title">Presets</div>
+                        <div class="seg wrap" id="presets"></div>
+                        <div class="group-title">Grid &amp; initial state</div>
+                        <div class="row c2">
+                            <label class="field"><span>Grid (cells per edge)</span>
+                                <select id="grid">
+                                    <option value="64">64²</option>
+                                    <option value="96">96²</option>
+                                    <option value="128">128²</option>
+                                    <option value="192">192²</option>
+                                    <option value="256">256²</option>
+                                </select></label>
+                            <label class="field"><span>Cell size Δx (µm)</span><input type="number" id="dx" min="0.01" step="0.1" value="1"></label>
+                            <label class="field"><span>Random seed</span><input type="number" id="seed" value="1"></label>
+                            <label class="field"><span id="tend-label">Stop at t (s)</span><input type="number" id="tend" min="0" step="any" value="1"></label>
+                        </div>
+                        <div class="init-fields" id="init-fields"></div>
+                        <p class="note" id="grid-note"></p>
+                        <button class="btn primary block" id="btn-apply">Reset with these settings</button>
+                        <div id="param-groups"></div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ================= DISPLAY ================= -->
+            <div class="tab-body" data-body="display" hidden>
+                <details class="sec" open>
+                    <summary>Field</summary>
+                    <div class="sec-body">
+                        <label class="field"><span>Show</span><select id="view"></select></label>
+                        <p class="note" id="view-note"></p>
+                        <label class="field" id="cmap-row"><span>Colour map</span>
+                            <select id="cmap">
+                                <option value="0">Viridis</option>
+                                <option value="1">Magma</option>
+                                <option value="2">Turbo</option>
+                                <option value="3">Cool–warm</option>
+                                <option value="4">Copper</option>
+                                <option value="5">Grey</option>
+                            </select></label>
+                        <div class="cbar" id="cbar"><span id="cbar-lo"></span><i id="cbar-grad"></i><span id="cbar-hi"></span></div>
+                        <label class="check" id="auto-row"><input type="checkbox" id="auto-range" checked> Fit the colour range every frame</label>
+                        <div class="row c2" id="range-row">
+                            <label class="field"><span>Min</span><input type="number" step="any" id="range-lo"></label>
+                            <label class="field"><span>Max</span><input type="number" step="any" id="range-hi"></label>
+                        </div>
+                    </div>
+                </details>
+                <details class="sec" open>
+                    <summary>Rendering</summary>
+                    <div class="sec-body">
+                        <label class="field"><span>Boundaries</span>
+                            <select id="boundary-mode">
+                                <option value="projected" selected>Gaussian-projected (sub-cell, smooth)</option>
+                                <option value="alpha">Cells, blended by α</option>
+                                <option value="cells">Cells, raw labels</option>
+                            </select></label>
+                        <p class="note">Projected boundaries take, at each screen pixel, the label with the largest Gaussian-weighted vote of nearby cells; an interface cell votes α for its own label and 1 − α for its competitor.</p>
+                        <label class="check"><input type="checkbox" id="smooth"> Smooth interpolation of cell views</label>
+                        <label class="check"><input type="checkbox" id="edges"> Outline label boundaries</label>
+                        <label class="check"><input type="checkbox" id="normals"> Show normals at interface cells</label>
+                        <label class="check"><input type="checkbox" id="log-chart"> Logarithmic time axis in the chart</label>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ================= METHOD ================= -->
+            <div class="tab-body" data-body="about" hidden>
+                <details class="sec" open>
+                    <summary>Gaussian-projected kinetics</summary>
+                    <div class="sec-body method">
+                        <p>Every cell stores an integer grain or phase label φ and a sub-cell position α of its boundary. Nothing diffuse is stored: near a boundary, the indicator of the resident label is smoothed with a Gaussian of fixed width ℓ<sub>G</sub> = 2Δx, and the normal and curvature are read from its gradient and Hessian. The Gaussian is then discarded.</p>
+                        <p>Each time step:</p>
+                        <ol>
+                            <li>find interface cells and measure n̂ and κ;</li>
+                            <li>evaluate v<sub>n</sub> = M [ΔG − σ(n̂) κ] from the process model;</li>
+                            <li>average v<sub>n</sub> over the same pair of labels, so unrelated boundaries at a junction never mix;</li>
+                            <li>move α by v<sub>n</sub>Δt/Δx; when it reaches zero the cell switches to the neighbouring label, but only if a digital-topology test shows no grain is split or merged;</li>
+                            <li>apply volume-balanced exchanges that smooth staircase artefacts, remove grains smaller than the Gaussian scale, and diffuse solute.</li>
+                        </ol>
+                        <p>The time step is Δt = Δx / (8 v<sub>max</sub>), limited further by diffusion.</p>
+                        <p>This page is a 2D JavaScript port of the C++ code and follows it step by step. From the same initial grains it reproduces the C++ grain-growth trajectory, with 4 of 16,384 cells different after 377 steps.</p>
+                        <p class="links"><a href="https://github.com/albert-hzbn/GPK" target="_blank" rel="noopener">GPK on GitHub</a> · <a href="https://arxiv.org/abs/2611.04582" target="_blank" rel="noopener">arXiv:2611.04582</a></p>
+                        <p class="note">A. Linda and D. Raabe, <i>A general sharp-interface simulation framework for microstructure evolution</i>, submitted to npj Computational Materials (2026).</p>
+                    </div>
+                </details>
+                <details class="sec" open>
+                    <summary>Using this page</summary>
+                    <div class="sec-body method">
+                        <p>Sliders change the run immediately. Grid, cell size, seed and initial settings take effect with <b>Reset with these settings</b>.</p>
+                        <p>Click the map to add a grain, nucleus or seed where the model allows it. Hover over a cell to read its values.</p>
+                        <p><b>Export → Input deck</b> writes a GPK <code>.ini</code> file with the current settings, so a run can be repeated with the full C++ code, in 3D or on larger grids.</p>
+                        <p>Keys: Space run/pause, S step, R reset.</p>
+                    </div>
+                </details>
+            </div>
+        </aside>
+
+        <section class="viewport pf-viewport gpk-viewport" id="viewport">
+            <div class="pane" id="pane-map">
+                <canvas id="map" aria-label="Microstructure"></canvas>
+                <div class="pane-label"><b id="hud-model">–</b><span id="hud-view"></span></div>
+                <div class="hud-stats" id="hud-stats"></div>
+                <div class="hover-readout" id="hover" hidden></div>
+                <div class="scalebar" id="scalebar"><i></i><span></span></div>
+                <div class="click-hint" id="click-hint"></div>
+            </div>
+            <div class="pane chart-pane" id="pane-chart">
+                <div class="chart-head"><b id="chart-title">Statistics</b><span id="chart-note"></span></div>
+                <div class="chart-legend" id="chart-legend"></div>
+                <div class="chart-box"><canvas id="chart" aria-label="Statistics over time"></canvas></div>
+            </div>
+            <div class="busy" id="busy"><div><div class="spinner"></div><span id="busy-text">Preparing…</span></div></div>
+        </section>
+    </main>
+
+    <footer class="statusbar">
+        <span id="st-model"></span>
+        <span><b id="st-step">0</b> steps</span>
+        <span>t = <b id="st-time">0</b></span>
+        <span id="st-rate"></span>
+        <span id="st-grid"></span>
+        <span class="hint" id="st-note">Runs on the CPU in a background thread</span>
+    </footer>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script type="module" src="js/gpk/main.js"></script>
+</body>
+
+</html>

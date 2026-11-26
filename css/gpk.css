@@ -1,0 +1,135 @@
+/* GPK Web: layout on top of the shared studio design (tools.css, phasefield.css). */
+
+.gpk-tiles button span {
+    font-size: 10.5px;
+    line-height: 1.2;
+}
+
+.gpk-viewport {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 34%);
+}
+
+#map {
+    cursor: crosshair;
+}
+
+.chart-pane {
+    display: flex;
+    flex-direction: column;
+    padding: 12px 12px 8px;
+}
+
+.chart-box {
+    position: relative;
+    flex: 1;
+    min-height: 120px;
+}
+
+.chart-head {
+    display: grid;
+    gap: 2px;
+}
+
+.chart-head b {
+    font-family: var(--serif);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.chart-head span {
+    min-height: 1.3em;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--ink-2);
+}
+
+.chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    margin: 4px 0 2px;
+    font-size: 11.5px;
+    color: var(--ink-2);
+}
+
+.chart-legend:empty {
+    display: none;
+}
+
+.chart-legend i {
+    display: inline-block;
+    width: 14px;
+    height: 3px;
+    margin-right: 6px;
+    border-radius: 2px;
+    vertical-align: middle;
+}
+
+.hover-readout {
+    position: absolute;
+    left: 12px;
+    bottom: 12px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--panel) 85%, transparent);
+    backdrop-filter: blur(6px);
+    border: 1px solid var(--line);
+    font-family: var(--mono);
+    font-size: 11.5px;
+    line-height: 1.5;
+    color: var(--ink-2);
+    pointer-events: none;
+}
+
+.click-hint {
+    position: absolute;
+    left: 50%;
+    bottom: 12px;
+    transform: translateX(-50%);
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--panel) 80%, transparent);
+    border: 1px solid var(--line);
+    font-size: 11px;
+    color: var(--ink-3);
+    pointer-events: none;
+}
+
+.hover-readout:not([hidden])~.click-hint {
+    display: none;
+}
+
+.click-hint:empty,
+.click-hint[hidden] {
+    display: none;
+}
+
+.method p,
+.method ol {
+    margin: 0;
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--ink-2);
+}
+
+.method ol {
+    padding-left: 18px;
+    display: grid;
+    gap: 4px;
+}
+
+.method a {
+    color: var(--accent);
+}
+
+.method code {
+    font-family: var(--mono);
+    font-size: 11.5px;
+}
+
+@media (max-width: 860px) {
+    .gpk-viewport {
+        grid-template-columns: 1fr;
+        grid-template-rows: minmax(0, 1.6fr) minmax(0, 1fr);
+    }
+}
