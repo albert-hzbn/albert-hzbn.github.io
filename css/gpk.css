@@ -104,6 +104,83 @@
     display: none;
 }
 
+/* 3D: canvas, the 3D/slice bar and the dimension switch */
+#view3d {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+    touch-action: none;
+}
+
+#view3d:active {
+    cursor: grabbing;
+}
+
+#map[hidden],
+#view3d[hidden],
+.scalebar[hidden] {
+    display: none;
+}
+
+.view-bar {
+    position: absolute;
+    left: 50%;
+    bottom: 12px;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 10px 4px 4px;
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--panel) 88%, transparent);
+    backdrop-filter: blur(6px);
+    border: 1px solid var(--line);
+    font-size: 11.5px;
+    color: var(--ink-2);
+    max-width: calc(100% - 24px);
+}
+
+.view-bar[hidden] {
+    display: none;
+}
+
+.view-bar .seg {
+    flex: none;
+    width: 112px;
+}
+
+.view-bar select {
+    height: 28px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--panel);
+    color: var(--ink);
+    font: inherit;
+    padding: 0 4px;
+}
+
+.view-bar input[type="range"] {
+    width: 130px;
+    min-width: 60px;
+    flex: 1 1 auto;
+}
+
+.view-bar span {
+    min-width: 44px;
+    font-family: var(--mono);
+    white-space: nowrap;
+}
+
+.view-bar:not([hidden])~.click-hint {
+    bottom: 58px;
+}
+
+.dim-seg {
+    margin-bottom: 10px;
+}
+
 .method p,
 .method ol {
     margin: 0;
@@ -131,5 +208,14 @@
     .gpk-viewport {
         grid-template-columns: 1fr;
         grid-template-rows: minmax(0, 1.6fr) minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .view-bar {
+        left: 8px;
+        right: 8px;
+        transform: none;
+        bottom: 52px;
     }
 }

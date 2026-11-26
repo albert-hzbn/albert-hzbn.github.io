@@ -1,6 +1,7 @@
 // GPK Web: simulation worker. Runs the engine off the main thread and posts
-// copies of the fields after each batch of steps.
+// copies of the fields after each batch of steps (the whole volume in 3D).
 import { GPK2D } from './engine.js';
+import { GPK3D } from './engine3d.js';
 import { MODELS, resolveParams, rng } from './models.js';
 
 let sim = null, model = null, P = null, I = null, rand = null, cfg = null;
@@ -13,7 +14,10 @@ function build(msg) {
     P = resolveParams(model, msg.params);
     I = msg.init;
     rand = rng(msg.seed);
-    sim = new GPK2D(msg.n, msg.n, msg.dx * 1e-6, model.thermo(P), model.diffusivity ? model.diffusivity(P) : 0);
+    const D = model.diffusivity ? model.diffusivity(P) : 0;
+    sim = msg.dim === 3
+        ? new GPK3D(msg.n, msg.n, msg.n, msg.dx * 1e-6, model.thermo(P), D)
+        : new GPK2D(msg.n, msg.n, msg.dx * 1e-6, model.thermo(P), D);
     model.setup(sim, P, I, rand);
     steps = 0;
     history = []; pending = []; lastRecord = -Infinity;
@@ -41,11 +45,12 @@ function post(full = false) {
     const f = {
         phi: sim.phi.slice(), alpha: sim.alpha.slice(), comp: sim.phiComp.slice(), mask: sim.mask.slice(),
         c: sim.c.slice(), g: sim.g.slice(), kappa: sim.kappa.slice(), vn: sim.vn.slice(),
-        nx: sim.nxF.slice(), ny: sim.nyF.slice(),
     };
+    // Normals are drawn only in 2D; a 3D volume would add three more arrays.
+    if (sim.Nz === 1) { f.nx = sim.nxF.slice(); f.ny = sim.nyF.slice(); }
     const last = history[history.length - 1];
     self.postMessage({
-        type: 'frame', n: sim.Nx, step: steps, time: sim.time, stats: last, running,
+        type: 'frame', n: sim.Nx, dim: sim.Nz > 1 ? 3 : 2, step: steps, time: sim.time, stats: last, running,
         history: full ? history : null, points: full ? null : pending, maxLabel: sim.maxLabel(), ...f,
     }, Object.values(f).map((a) => a.buffer));
     pending = [];
@@ -72,7 +77,8 @@ function advance(maxSteps, budgetMs) {
 function loop() {
     timer = 0;
     if (!running || !sim) return;
-    const end = advance(stepsPerBatch || Infinity, stepsPerBatch ? Infinity : 30);
+    // A 3D frame copies the whole volume, so it is posted about six times a second.
+    const end = advance(stepsPerBatch || Infinity, stepsPerBatch ? Infinity : sim.Nz > 1 ? 160 : 30);
     record();
     if (end) {
         running = false;
@@ -110,7 +116,7 @@ self.onmessage = (e) => {
             cfg.tEnd = m.tEnd;
         } else if (m.type === 'seed') {
             if (!model.seed) return;
-            const note = model.seed(sim, m.x, m.y, P, rand, I);
+            const note = model.seed(sim, m.x, m.y, P, rand, I, m.z);
             sim.stepInterfaceMask(); sim.stepGeometry(); sim.stepVelocities(); sim.stepVelocityProjection();
             post();
             self.postMessage({ type: 'note', text: note });

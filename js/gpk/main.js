@@ -1,7 +1,9 @@
 // GPK Web: application controller. The simulation runs in worker.js; this
-// module owns the panel, the 2D rendering, the statistics chart and exports.
-import { MODELS, defaults } from './models.js';
+// module owns the panel, the 2D map (or a slice of a 3D run), the 3D view,
+// the statistics chart and exports.
+import { MODELS, defaults, settingsFor } from './models.js';
 import { COLORMAPS, gradientCSS } from '../phasefield/ui/colormaps.js';
+import { surfaceNets } from './surface.js';
 
 const $ = (id) => document.getElementById(id);
 const HALF_PI = Math.PI / 2;
@@ -23,6 +25,10 @@ const PHASE_COLORS = {
 };
 const PHASE_NAMES = { solidification: ['liquid', 'solid'], precipitation: ['α matrix', 'β', 'γ'], wulff_shape: ['matrix', 'grain'] };
 const SERIES_COLORS = ['#2f6fdb', '#e0662f', '#1f9d63'];
+const GRIDS = { 2: [64, 96, 128, 192, 256], 3: [32, 40, 48, 64, 80, 96] };
+// Models whose label 0 is a matrix (deformed grains, liquid, parent phase) that the 3D view can hide.
+const MATRIX_MODELS = new Set(['recrystallisation', 'solidification', 'precipitation', 'wulff_shape']);
+const SLICE_FIELDS = ['phi', 'alpha', 'comp', 'mask', 'c', 'g', 'kappa', 'vn'];
 
 const app = {
     worker: null, model: null, params: {}, init: {}, n: 128, dx: 1, seed: 1, tEnd: 1,
@@ -31,7 +37,10 @@ const app = {
     running: false, frame: null, history: [], needsReset: false,
     rate: { steps: 0, last: 0, since: performance.now(), value: 0 },
     hover: null, dirty: true,
+    dim: 2, vol: null, slice: { axis: 'z', k: 0 }, show: '3d', clip: false, hideMatrix: true,
+    v3: null, meshDirty: false, lastMesh: 0,
 };
+const sup = () => (app.dim === 3 ? '³' : '²');
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -106,7 +115,8 @@ function startWorker() {
             else if (m.points) app.history.push(...m.points);
             if (app.history.length > 4000) app.history = app.history.filter((_, k) => k % 2 === 0);
             const prev = app.frame;
-            app.frame = m;
+            if (m.dim === 3) { app.vol = m; app.frame = sliceOf(m); app.meshDirty = true; }
+            else { app.vol = null; app.frame = m; }
             if (prev && m.step > prev.step) app.rate.steps += m.step - prev.step;
             app.dirty = true;
             busy(false);
@@ -181,7 +191,7 @@ function renderModelPanel() {
     const m = app.model;
     $('model-icon').innerHTML = m.icon;
     $('model-name').textContent = m.name;
-    $('model-short').textContent = `${m.params.length} parameters · 2D`;
+    $('model-short').textContent = `${m.params.length} parameters · ${app.dim}D`;
     $('model-desc').innerHTML = m.description;
     renderEquations($('model-eq'), m);
     document.querySelectorAll('#model-tiles button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.model === m.id)));
@@ -228,10 +238,16 @@ function renderModelPanel() {
     }
     syncGridControls();
     $('click-hint').textContent = m.seed ? 'Click to seed' : '';
-    $('click-hint').hidden = !m.seed;
+    $('click-hint').hidden = !m.seed || (app.dim === 3 && app.show === '3d');
+}
+
+function fillGridOptions() {
+    const list = GRIDS[app.dim].includes(app.n) ? GRIDS[app.dim] : [...GRIDS[app.dim], app.n].sort((a, b) => a - b);
+    $('grid').innerHTML = list.map((n) => `<option value="${n}">${n}${sup()}</option>`).join('');
 }
 
 function syncGridControls() {
+    fillGridOptions();
     $('grid').value = String(app.n);
     $('dx').value = app.dx;
     $('seed').value = app.seed;
@@ -241,15 +257,18 @@ function syncGridControls() {
 
 function updateGridNote() {
     const n = +$('grid').value, dx = +$('dx').value;
-    $('grid-note').innerHTML = `Domain <b>${+(n * dx).toPrecision(4)} µm</b> wide, ${(n * n).toLocaleString()} cells, periodic in x and y. Gaussian width ℓ<sub>G</sub> = 2Δx = ${+(2 * dx).toPrecision(3)} µm.`;
+    const cells = app.dim === 3 ? n ** 3 : n * n;
+    const slow = app.dim === 3 && n >= 80 ? ' Grids this large take up to a second per step.' : '';
+    $('grid-note').innerHTML = `Domain <b>${+(n * dx).toPrecision(4)} µm</b> wide, ${cells.toLocaleString()} cells, periodic in ${app.dim === 3 ? 'x, y and z' : 'x and y'}. Gaussian width ℓ<sub>G</sub> = 2Δx = ${+(2 * dx).toPrecision(3)} µm.${slow}`;
 }
 
 function applyPreset(preset, button) {
     $('presets').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b === button)));
-    for (const [k, v] of Object.entries(preset.params || {})) { app.params[k] = v; controls.params[k]?.set(v); }
-    for (const [k, v] of Object.entries(preset.init || {})) { app.init[k] = v; controls.init[k]?.set(v); }
-    if (preset.n) app.n = preset.n; else app.n = app.model.n;
-    app.tEnd = preset.tEnd || app.model.tEnd;
+    const st = settingsFor(app.model, app.dim, preset);
+    for (const [k, v] of Object.entries(st.params)) { app.params[k] = v; controls.params[k]?.set(v); }
+    for (const [k, v] of Object.entries(st.init)) { app.init[k] = v; controls.init[k]?.set(v); }
+    app.n = st.n;
+    app.tEnd = st.tEnd;
     syncGridControls();
     reset();
     toast(`Preset: ${preset.label}`);
@@ -265,9 +284,10 @@ function selectModel(id) {
     const m = MODELS.find((x) => x.id === id);
     if (!m) return;
     app.model = m;
-    app.params = defaults(m.params);
-    app.init = defaults(m.init);
-    app.n = m.n; app.dx = m.dx; app.tEnd = m.tEnd;
+    const st = settingsFor(m, app.dim);
+    app.params = { ...defaults(m.params), ...st.params };
+    app.init = { ...defaults(m.init), ...st.init };
+    app.n = st.n; app.dx = m.dx; app.tEnd = st.tEnd;
     renderModelPanel();
     fillViews();
     setView(m.views[0]);
@@ -284,9 +304,11 @@ function reset() {
     app.needsReset = false;
     $('btn-apply').classList.remove('pulse');
     app.frame = null;
+    app.vol = null;
     app.history = [];
-    busy(true, `Initialising ${app.model.short} on ${app.n}²…`);
-    send({ type: 'init', model: app.model.id, params: app.params, init: app.init, n: app.n, dx: app.dx, seed: app.seed, tEnd: app.tEnd });
+    if (app.dim === 3) setSlice(app.slice.axis, app.n >> 1);
+    busy(true, `Initialising ${app.model.short} on ${app.n}${sup()}…`);
+    send({ type: 'init', model: app.model.id, dim: app.dim, params: app.params, init: app.init, n: app.n, dx: app.dx, seed: app.seed, tEnd: app.tEnd });
     send({ type: 'speed', steps: +$('speed').value });
 }
 
@@ -446,6 +468,25 @@ function projectedImage(f, cols, U) {
     return out;
 }
 
+// Automatic colour range over the cells where use(i) holds.
+function fitRange(data, scale, use, N, diverging) {
+    let lo = Infinity, hi = -Infinity;
+    for (let i = 0; i < N; i++) if (use(i)) { const x = data[i] * scale; if (x < lo) lo = x; if (x > hi) hi = x; }
+    if (!(hi >= lo)) { lo = 0; hi = 1; }
+    if (diverging) {
+        // Symmetric range from the 98th percentile of |x|, so a few
+        // junction cells at the curvature limit do not wash out the rest.
+        const mags = [];
+        for (let i = 0; i < N; i++) if (use(i)) mags.push(Math.abs(data[i] * scale));
+        mags.sort((p, q) => p - q);
+        const a = Math.max(mags[Math.floor(0.98 * (mags.length - 1))] || 0, 1e-12);
+        lo = -a; hi = a;
+    }
+    if (hi - lo < 1e-12) { hi = lo + 1e-6; }
+    app.lo = lo; app.hi = hi;
+    updateColorbar();
+}
+
 function renderImage() {
     const f = app.frame;
     if (!f) return;
@@ -463,23 +504,7 @@ function renderImage() {
     } else {
         const { data, scale, all } = scalarField(f, app.view);
         const use = (i) => all || f.mask[i];
-        if (app.autoRange) {
-            let lo = Infinity, hi = -Infinity;
-            for (let i = 0; i < N; i++) if (use(i)) { const x = data[i] * scale; if (x < lo) lo = x; if (x > hi) hi = x; }
-            if (!(hi >= lo)) { lo = 0; hi = 1; }
-            if (v.diverging) {
-                // Symmetric range from the 98th percentile of |x|, so a few
-                // junction cells at the curvature limit do not wash out the rest.
-                const mags = [];
-                for (let i = 0; i < N; i++) if (use(i)) mags.push(Math.abs(data[i] * scale));
-                mags.sort((p, q) => p - q);
-                const a = Math.max(mags[Math.floor(0.98 * (mags.length - 1))] || 0, 1e-12);
-                lo = -a; hi = a;
-            }
-            if (hi - lo < 1e-12) { hi = lo + 1e-6; }
-            app.lo = lo; app.hi = hi;
-            updateColorbar();
-        }
+        if (app.autoRange) fitRange(data, scale, use, N, v.diverging);
         const cm = COLORMAPS[app.cmap];
         const bg = all ? null : blendedColors(f, cellColors(f));
         const dark = document.documentElement.dataset.theme === 'dark';
@@ -549,7 +574,7 @@ function drawMap() {
         ctx.lineWidth = Math.max(1, devicePixelRatio * 0.8);
         ctx.stroke();
     }
-    if (app.normals && cell >= 5) {
+    if (app.normals && f.nx && cell >= 5) {
         // Outward normal of the resident label from the Gaussian projection.
         ctx.beginPath();
         for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) {
@@ -588,15 +613,16 @@ function updateScalebar(cellCss) {
 
 function drawChart() {
     const c = $('chart'), ctx = c.getContext('2d'), m = app.model;
+    const C = (app.dim === 3 && m.chart3) || m.chart;
     const css = getComputedStyle(document.documentElement);
     const ink = css.getPropertyValue('--ink-2').trim() || '#555', faint = css.getPropertyValue('--ink-3').trim() || '#999';
     const line = css.getPropertyValue('--line').trim() || '#ddd';
     const W = c.width, H = c.height, d = devicePixelRatio;
     ctx.clearRect(0, 0, W, H);
     const h = app.history;
-    $('chart-title').textContent = m.chart.y;
-    $('chart-legend').innerHTML = m.chart.series.length > 1
-        ? m.chart.series.map((s, k) => `<span><i style="background:${s.color || SERIES_COLORS[k]}"></i>${s.label}</span>`).join('') : '';
+    $('chart-title').textContent = C.y;
+    $('chart-legend').innerHTML = C.series.length > 1
+        ? C.series.map((s, k) => `<span><i style="background:${s.color || SERIES_COLORS[k]}"></i>${s.label}</span>`).join('') : '';
     if (h.length < 2) {
         ctx.fillStyle = faint;
         ctx.font = `${12 * d}px Inter, sans-serif`;
@@ -611,8 +637,8 @@ function drawChart() {
     let xmin = log ? Math.max(xs.find((t) => t > 0) || 1e-12, 1e-30) : 0, xmax = Math.max(...xs, 1e-30);
     if (log && !(xmax > xmin)) xmax = xmin * 10;
     let ymin = Infinity, ymax = -Infinity;
-    for (const s of m.chart.series) for (const p of h) { const y = p[s.key]; if (y < ymin) ymin = y; if (y > ymax) ymax = y; }
-    if (m.chart.yMax !== undefined) { ymin = 0; ymax = m.chart.yMax; }
+    for (const s of C.series) for (const p of h) { const y = p[s.key]; if (y < ymin) ymin = y; if (y > ymax) ymax = y; }
+    if (C.yMax !== undefined) { ymin = 0; ymax = C.yMax; }
     else { ymin = Math.min(0, ymin); const pad = (ymax - ymin) * 0.06 || 1; ymax += pad; }
     const X = (t) => L + (W - L - R) * (log ? (Math.log10(Math.max(t, xmin)) - Math.log10(xmin)) / (Math.log10(xmax) - Math.log10(xmin) || 1) : t / xmax);
     const Y = (y) => H - B - (H - T - B) * (y - ymin) / (ymax - ymin || 1);
@@ -641,7 +667,7 @@ function drawChart() {
     ctx.strokeStyle = faint;
     ctx.beginPath(); ctx.moveTo(L, T); ctx.lineTo(L, H - B); ctx.lineTo(W - R, H - B); ctx.stroke();
 
-    m.chart.series.forEach((s, k) => {
+    C.series.forEach((s, k) => {
         ctx.beginPath();
         h.forEach((p, j) => { const x = X(p.t), y = Y(p[s.key]); j ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
         ctx.strokeStyle = s.color || SERIES_COLORS[k]; ctx.lineWidth = 2 * d; ctx.lineJoin = 'round';
@@ -694,7 +720,7 @@ function updateStatus() {
     const f = app.frame, m = app.model;
     $('st-model').textContent = m.name;
     $('hud-model').textContent = m.name;
-    $('st-grid').textContent = `${app.n}² grid · Δx = ${app.dx} µm`;
+    $('st-grid').textContent = `${app.n}${sup()} grid · Δx = ${app.dx} µm`;
     if (!f) return;
     $('st-step').textContent = f.step.toLocaleString();
     $('st-time').textContent = fmtTime(f.time);
@@ -709,7 +735,7 @@ function updateHover() {
     const i = h.y * f.n + h.x, m = app.model;
     const names = PHASE_NAMES[m.id];
     const label = names ? `${names[f.phi[i]] ?? f.phi[i]} (${f.phi[i]})` : (m.id === 'recrystallisation' && f.phi[i] === 0 ? 'deformed (0)' : `grain ${f.phi[i]}`);
-    const rows = [`cell (${h.x}, ${h.y})`, label];
+    const rows = [app.dim === 3 ? `cell (${cellOf(h.x, h.y).join(', ')})` : `cell (${h.x}, ${h.y})`, label];
     if (f.mask[i]) {
         const comp = names ? (names[f.comp[i]] ?? f.comp[i]) : f.comp[i];
         rows.push(`α = ${f.alpha[i].toFixed(3)} → ${comp}`);
@@ -740,7 +766,8 @@ function initInteraction() {
         const p = cellAt(e);
         if (!p) return;
         if (!app.model.seed) { toast('This model has no seeding; change the settings and reset instead.'); return; }
-        send({ type: 'seed', x: p.x, y: p.y });
+        if (app.dim === 3) { const [x, y, z] = cellOf(p.x, p.y); send({ type: 'seed', x, y, z }); }
+        else send({ type: 'seed', x: p.x, y: p.y });
     });
 }
 
@@ -750,15 +777,19 @@ function initInteraction() {
 
 function frame() {
     requestAnimationFrame(frame);
-    const sized = resizeCanvas($('map')) | resizeCanvas($('chart'));
+    const show3d = app.dim === 3 && app.show === '3d';
+    const sized = (show3d ? 0 : resizeCanvas($('map'))) | resizeCanvas($('chart'));
+    if (show3d && app.v3) app.v3.resize();
     if (app.dirty || sized) {
-        if (app.dirty) renderImage();
-        drawMap();
+        if (show3d) { if (app.dirty) app.meshDirty = true; }
+        else { if (app.dirty) renderImage(); drawMap(); }
         drawChart();
         updateStatus();
         updateHover();
         app.dirty = false;
     }
+    // Rebuilding the surface costs tens of milliseconds, so at most about six times a second.
+    if (show3d && app.v3 && app.meshDirty && performance.now() - app.lastMesh > 160) buildMesh();
     const now = performance.now();
     if (now - app.rate.since > 800) {
         app.rate.value = app.rate.steps * 1000 / (now - app.rate.since);
@@ -814,6 +845,7 @@ function initChrome() {
         document.documentElement.dataset.theme = t;
         try { localStorage.setItem('studio-theme', t); } catch { /* ignore */ }
         app.dirty = true;
+        theme3D();
     });
     window.addEventListener('keydown', (e) => {
         if (/INPUT|SELECT|TEXTAREA/.test(document.activeElement?.tagName) || e.ctrlKey || e.metaKey || e.altKey) return;
@@ -826,8 +858,11 @@ function initChrome() {
 function doExport(kind) {
     const f = app.frame, m = app.model;
     if (!f) return;
-    const name = `gpk_${m.id}_${f.n}_step${f.step}`;
-    if (kind === 'png') {
+    const name = `gpk_${m.id}_${f.n}${app.dim === 3 ? '_3d' : ''}_step${f.step}`;
+    if (kind === 'png' && app.dim === 3 && app.show === '3d' && app.v3) {
+        app.v3.render();
+        $('view3d').toBlob((b) => b && download(`${name}_3d.png`, b, 'image/png'), 'image/png');
+    } else if (kind === 'png') {
         const scale = Math.max(1, Math.floor(1024 / off.width));
         const c = document.createElement('canvas');
         c.width = c.height = off.width * scale;
@@ -837,6 +872,15 @@ function doExport(kind) {
         c.toBlob((b) => b && download(`${name}.png`, b, 'image/png'), 'image/png');
     } else if (kind === 'chartpng') {
         $('chart').toBlob((b) => b && download(`${name}_chart.png`, b, 'image/png'), 'image/png');
+    } else if (kind === 'csv' && app.vol) {
+        const v = app.vol, n = v.n, rows = ['x_um,y_um,z_um,label,alpha,competitor,interface,composition,orientation_rad,curvature_per_um,velocity_um_per_s'];
+        const um = (k) => ((k + 0.5) * app.dx).toFixed(4);
+        for (let z = 0; z < n; z++) for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) {
+            const i = (z * n + y) * n + x;
+            rows.push([um(x), um(y), um(z), v.phi[i], v.alpha[i].toFixed(5), v.comp[i], v.mask[i],
+                v.c[i].toPrecision(6), v.g[i].toFixed(5), (v.kappa[i] * 1e-6).toPrecision(5), (v.vn[i] * 1e6).toPrecision(5)].join(','));
+        }
+        download(`${name}.csv`, `# GPK Web, ${m.name}, 3D ${n}^3, t = ${v.time} s, step ${v.step}\n` + rows.join('\n'), 'text/csv');
     } else if (kind === 'csv') {
         const rows = ['x_um,y_um,label,alpha,competitor,interface,composition,orientation_rad,curvature_per_um,velocity_um_per_s'];
         const n = f.n;
@@ -852,10 +896,159 @@ function doExport(kind) {
     } else if (kind === 'ini') {
         const P = {};
         for (const p of m.params) P[p.key] = p.type === 'check' ? !!app.params[p.key] : app.params[p.key] * (p.scale || 1);
-        const deck = m.deck({ n: app.n, dx: app.dx * 1e-6, tEnd: app.tEnd, seed: app.seed }, P, app.init);
+        const deck = m.deck({ n: app.n, nz: app.dim === 3 ? app.n : 1, dx: app.dx * 1e-6, tEnd: app.tEnd, seed: app.seed }, P, app.init);
         download(`${m.id}.ini`, deck, 'text/plain');
         toast('Saved a GPK input deck');
     }
+}
+
+// ---------------------------------------------------------------------------
+// 3D: dimension switch, slices and the surface view
+// ---------------------------------------------------------------------------
+
+// Volume index of in-plane cell (u, v) on slice k: the plane is xy for a z
+// slice, xz for a y slice and yz for an x slice.
+function cellOf(u, v) {
+    const k = app.slice.k, a = app.slice.axis;
+    return a === 'z' ? [u, v, k] : a === 'y' ? [u, k, v] : [k, u, v];
+}
+
+function sliceOf(vol) {
+    const n = vol.n, out = { ...vol };
+    const k = Math.min(n - 1, Math.max(0, app.slice.k)), a = app.slice.axis;
+    // Strides of the in-plane axes u, v and of the slice axis in the volume.
+    const sx = 1, sy = n, sz = n * n;
+    const [su, sv, sk] = a === 'z' ? [sx, sy, sz] : a === 'y' ? [sx, sz, sy] : [sy, sz, sx];
+    for (const key of SLICE_FIELDS) {
+        const src = vol[key], dst = new src.constructor(n * n);
+        for (let v = 0; v < n; v++) {
+            const base = v * sv + k * sk;
+            for (let u = 0; u < n; u++) dst[v * n + u] = src[base + u * su];
+        }
+        out[key] = dst;
+    }
+    out.nx = out.ny = null;
+    return out;
+}
+
+function setSlice(axis, k) {
+    const n = app.vol ? app.vol.n : app.n;
+    app.slice.axis = axis;
+    app.slice.k = Math.max(0, Math.min(n - 1, k | 0));
+    for (const id of ['slice-axis', 'bar-axis']) $(id).value = axis;
+    for (const id of ['slice-pos', 'bar-pos']) { $(id).max = String(n - 1); $(id).value = String(app.slice.k); }
+    const txt = `${axis} = ${app.slice.k}`;
+    $('slice-pos-out').textContent = txt;
+    $('bar-pos-out').textContent = txt;
+    if (app.vol) app.frame = sliceOf(app.vol);
+    app.dirty = true;
+    if (app.clip) app.meshDirty = true;
+}
+
+function setShow(show) {
+    app.show = show;
+    document.querySelectorAll('[data-show]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.show === show)));
+    const three = app.dim === 3 && show === '3d';
+    $('map').hidden = three;
+    $('view3d').hidden = !three;
+    $('scalebar').hidden = three;
+    $('click-hint').hidden = three || !app.model?.seed;
+    if (three) ensure3D();
+    app.dirty = true;
+    app.meshDirty = true;
+}
+
+function applyDimChrome() {
+    document.querySelectorAll('#dim-seg button').forEach((b) => b.setAttribute('aria-pressed', String(+b.dataset.dim === app.dim)));
+    $('sec-3d').hidden = app.dim !== 3;
+    $('view-bar').hidden = app.dim !== 3;
+    $('normals').disabled = app.dim === 3;
+    setShow(app.show);
+}
+
+function setDim(d) {
+    if (app.dim === d) return;
+    app.dim = d;
+    try { localStorage.setItem('gpk-dim', String(d)); } catch { /* ignore */ }
+    applyDimChrome();
+    selectModel(app.model.id);
+}
+
+let v3Loading = null;
+function ensure3D() {
+    if (app.v3 || v3Loading) return v3Loading;
+    v3Loading = import('./view3d.js').then((mod) => {
+        app.v3 = new mod.View3D($('view3d'));
+        theme3D();
+        app.meshDirty = true;
+    }).catch((e) => {
+        v3Loading = null;
+        toast(`Could not load the 3D viewer: ${e.message}. Showing slices instead.`, true);
+        setShow('slice');
+    });
+    return v3Loading;
+}
+
+function theme3D() {
+    if (!app.v3) return;
+    const css = getComputedStyle(document.documentElement);
+    app.v3.setTheme(css.getPropertyValue('--app-bg').trim() || '#eef0f3', css.getPropertyValue('--ink-3').trim() || '#8a8f98');
+    app.meshDirty = true;
+}
+
+// Colour of volume cell i for the current view, written into out[0..2].
+function volumeColour(vol) {
+    const m = app.model, v = VIEWS[app.view], N = vol.n ** 3;
+    if (v.cmap === undefined) {
+        const pc = PHASE_COLORS[m.id], lut = labelColors(vol.maxLabel);
+        const matrix = pc ? pc[0] : [0.62, 0.63, 0.66];
+        const zeroIsMatrix = m.id === 'recrystallisation' || m.id === 'solidification';
+        const phaseView = app.view === 'phase' && pc, orient = app.view === 'orient';
+        return (i, out) => {
+            const l = vol.phi[i];
+            let c;
+            if (zeroIsMatrix && l === 0) c = matrix;
+            else if (orient) c = hsl((vol.g[i] / HALF_PI) % 1, 0.55, 0.58);
+            else if (phaseView) c = pc[Math.min(l, pc.length - 1)];
+            else { out[0] = lut[3 * l]; out[1] = lut[3 * l + 1]; out[2] = lut[3 * l + 2]; return; }
+            out[0] = c[0]; out[1] = c[1]; out[2] = c[2];
+        };
+    }
+    const { data, scale, all } = scalarField(vol, app.view);
+    const use = (i) => all || vol.mask[i];
+    if (app.autoRange) fitRange(data, scale, use, N, v.diverging);
+    const cm = COLORMAPS[app.cmap], lo = app.lo, span = app.hi - app.lo;
+    return (i, out) => {
+        if (!use(i)) { out[0] = out[1] = out[2] = 0.72; return; }
+        const c = cm(Math.min(1, Math.max(0, (data[i] * scale - lo) / span)));
+        out[0] = c[0]; out[1] = c[1]; out[2] = c[2];
+    };
+}
+
+function buildMesh() {
+    const vol = app.vol;
+    app.meshDirty = false;
+    app.lastMesh = performance.now();
+    if (!vol || !app.v3) return;
+    const n = vol.n, phi = vol.phi, occ = new Uint8Array(n ** 3);
+    const hide = app.hideMatrix && MATRIX_MODELS.has(app.model.id);
+    const cut = app.clip ? app.slice.k : Infinity, axis = app.slice.axis;
+    for (let z = 0, i = 0; z < n; z++) for (let y = 0; y < n; y++) for (let x = 0; x < n; x++, i++) {
+        if (hide && phi[i] === 0) continue;
+        if ((axis === 'x' ? x : axis === 'y' ? y : z) > cut) continue;
+        occ[i] = 1;
+    }
+    app.v3.setMesh(n, surfaceNets(n, occ, volumeColour(vol)));
+}
+
+function init3DControls() {
+    document.querySelectorAll('#dim-seg button').forEach((b) => b.addEventListener('click', () => setDim(+b.dataset.dim)));
+    document.querySelectorAll('[data-show]').forEach((b) => b.addEventListener('click', () => setShow(b.dataset.show)));
+    for (const id of ['slice-axis', 'bar-axis']) $(id).addEventListener('change', (e) => setSlice(e.target.value, app.slice.k));
+    for (const id of ['slice-pos', 'bar-pos']) $(id).addEventListener('input', (e) => setSlice(app.slice.axis, +e.target.value));
+    $('clip3d').addEventListener('change', (e) => { app.clip = e.target.checked; app.meshDirty = true; });
+    $('hide-matrix').addEventListener('change', (e) => { app.hideMatrix = e.target.checked; app.meshDirty = true; });
+    $('btn-camera').addEventListener('click', () => app.v3?.resetCamera());
 }
 
 // ---------------------------------------------------------------------------
@@ -866,8 +1059,15 @@ function start() {
     startWorker();
     buildModelTiles();
     initDisplayPanel();
+    init3DControls();
     initInteraction();
     initChrome();
+    let dim = 2;
+    try { if (localStorage.getItem('gpk-dim') === '3') dim = 3; } catch { /* ignore */ }
+    const qd = new URLSearchParams(location.search).get('dim');
+    if (qd === '2' || qd === '3') dim = +qd;
+    app.dim = dim;
+    applyDimChrome();
     let first = MODELS[0].id;
     try { const saved = localStorage.getItem('gpk-model'); if (MODELS.some((m) => m.id === saved)) first = saved; } catch { /* ignore */ }
     const q = new URLSearchParams(location.search).get('model');

@@ -43,7 +43,7 @@ class GaussKernel {
 
 export class GPK2D {
     constructor(Nx, Ny, dx, thermo, D = 0, sigmaCells = 2) {
-        this.Nx = Nx; this.Ny = Ny; this.N = Nx * Ny;
+        this.Nx = Nx; this.Ny = Ny; this.Nz = 1; this.N = Nx * Ny;
         this.dx = dx; this.th = thermo; this.D = D;
         this.time = 0; this.stepId = 0;
         const N = this.N;
