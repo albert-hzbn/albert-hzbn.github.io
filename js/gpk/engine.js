@@ -245,8 +245,8 @@ export class GPK2D {
             gComp[i] = gq;
             const ci = th.interfaceComp ? th.interfaceComp(p, q, c[i], cq) : c[i];
             const dG = th.bulkDG(p, q, ci, T[i]);
-            const sig = th.sigma(nxF[i], nyF[i], gp, p, q, c[i]);
-            const mob = th.mobility(gp, gq, T[i]);
+            const sig = th.sigma(nxF[i], nyF[i], gp, p, q, c[i], gq);
+            const mob = th.mobility(gp, gq, T[i], nxF[i], nyF[i]);
             vn[i] = mob * (dG - sig * kappa[i]);
         }
     }

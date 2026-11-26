@@ -63,7 +63,8 @@ function advance(maxSteps, budgetMs) {
         const due = sim.time - lastRecord >= cfg.tEnd / 1500;
         const s = model.stop || due ? model.stats(sim) : null;
         if (due) record(true, s);
-        if (model.stop && model.stop(s)) return 'done';
+        const why = model.stop && model.stop(s, I, sim);
+        if (why) return typeof why === 'string' ? why : 'done';
     }
     return null;
 }

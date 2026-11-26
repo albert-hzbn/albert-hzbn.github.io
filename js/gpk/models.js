@@ -258,14 +258,15 @@ seed      = ${s.seed}
         name: 'Dendritic solidification',
         short: 'Solidification',
         icon: '<path d="M12 3v18M3 12h18"/><path d="M12 7l-2.5-2M12 7l2.5-2M12 17l-2.5 2M12 17l2.5 2M7 12l-2-2.5M7 12l-2 2.5M17 12l2-2.5M17 12l2 2.5"/>',
-        description: 'A solid seed (label 1) grows into an undercooled binary melt (label 0). The driving force is the local undercooling below the liquidus, ΔG = L ΔT / T<sub>m</sub>; four-fold anisotropy selects the arm directions. With solute rejection on, the growing solid keeps k c<sub>L</sub> and rejects the rest into the liquid, which lowers the local liquidus and makes the front unstable. Click to add a seed.',
-        equations: [...eqCore, String.raw`\Delta G_{L\to S} = -\frac{L}{T_m}\,(T_m + m_L c - T)`],
-        n: 128, dx: 0.5, tEnd: 2e-3,
+        description: 'A solid seed (label 1) grows into an undercooled binary melt (label 0), driven by the undercooling below the local liquidus, ΔG = L ΔT / T<sub>m</sub>. The growing solid keeps k c<sub>L</sub> and rejects the rest into the liquid. A bump on the front reaches fresher, solute-poor melt and grows faster (the Mullins–Sekerka instability), so the front breaks into arms once the solute layer D/v spans several cells. Kinetic anisotropy ε<sub>k</sub> sets the ⟨10⟩ arm directions of each crystal, so a rotated seed grows rotated arms, although the square grid pulls off-axis arms part of the way back toward x and y. Click to add a seed with a random orientation.',
+        equations: [...eqCore, String.raw`\Delta G_{L\to S} = -\frac{L}{T_m}\,(T_m + m_L c - T)`, String.raw`M(\hat n) = M_0\,[1+\varepsilon_k\cos 4\theta_c]`],
+        n: 256, dx: 0.5, tEnd: 0.03,
         params: [
-            { key: 'dT', label: 'Undercooling ΔT (K)', min: 0.5, max: 20, step: 0.5, value: 5, group: 'Thermodynamics' },
-            { key: 'eps4', label: 'Four-fold anisotropy ε<sub>4</sub>', min: 0, max: 0.15, step: 0.01, value: 0.04, group: 'Interface' },
+            { key: 'dT', label: 'Undercooling ΔT (K)', min: 1, max: 20, step: 0.5, value: 4, group: 'Thermodynamics' },
+            { key: 'epsKin', label: 'Kinetic anisotropy ε<sub>k</sub>', min: 0, max: 0.8, step: 0.05, value: 0.5, group: 'Interface' },
+            { key: 'eps4', label: 'Energy anisotropy ε<sub>4</sub>', min: 0, max: 0.15, step: 0.01, value: 0.04, group: 'Interface' },
             { key: 'sigma0', label: 'Interface energy σ<sub>0</sub> (J m⁻²)', min: 0.05, max: 0.6, step: 0.01, value: 0.2, group: 'Interface' },
-            { key: 'M0', label: 'Mobility M<sub>0</sub> (10⁻⁸ m³ J⁻¹ s⁻¹)', min: 0.5, max: 20, step: 0.5, value: 5, scale: 1e-8, group: 'Interface' },
+            { key: 'M0', label: 'Mobility M<sub>0</sub> (10⁻⁸ m³ J⁻¹ s⁻¹)', min: 0.2, max: 10, step: 0.1, value: 1, scale: 1e-8, group: 'Interface' },
             { key: 'D', label: 'Solute diffusivity D (10⁻⁹ m² s⁻¹)', min: 0.1, max: 10, step: 0.1, value: 3, scale: 1e-9, group: 'Solute' },
             { key: 'k', label: 'Partition coefficient k', min: 0.05, max: 1, step: 0.05, value: 0.3, group: 'Solute' },
             { key: 'reject', label: 'Solute rejection at the growing solid', type: 'check', value: true, group: 'Solute' },
@@ -273,17 +274,23 @@ seed      = ${s.seed}
         init: [
             { key: 'c0', label: 'Alloy composition c₀', min: 0, max: 0.1, step: 0.005, value: 0.02 },
             { key: 'seedR', label: 'Seed radius (cells)', min: 2, max: 12, step: 1, value: 4 },
+            { key: 'theta', label: 'Seed orientation (°)', min: 0, max: 45, step: 1, value: 0 },
+            { key: 'nSeeds', label: 'Seeds', min: 1, max: 20, step: 1, value: 1 },
         ],
         fixed: { mLiq: -500, Tm: 933, L: 1e8 },
         presets: [
-            { label: 'Dendrite', params: { dT: 5, eps4: 0.04, reject: true }, init: { c0: 0.02 } },
-            { label: 'Isotropic', params: { dT: 5, eps4: 0, reject: true }, init: { c0: 0.02 } },
-            { label: 'Pure growth', params: { dT: 5, eps4: 0.04, reject: false }, init: { c0: 0.02 } },
-            { label: 'High ΔT', params: { dT: 12, eps4: 0.06, reject: true }, init: { c0: 0.03 } },
+            { label: 'Dendrite', params: { dT: 4, epsKin: 0.5, eps4: 0.04, M0: 1, reject: true }, init: { c0: 0.02, theta: 0, nSeeds: 1 } },
+            { label: 'Rotated 20°', params: { dT: 4, epsKin: 0.5, eps4: 0.04, M0: 1, reject: true }, init: { c0: 0.02, theta: 20, nSeeds: 1 } },
+            { label: 'Equiaxed', params: { dT: 4, epsKin: 0.5, eps4: 0.04, M0: 1, reject: true }, init: { c0: 0.02, theta: 0, nSeeds: 6 } },
+            { label: 'Isotropic', params: { dT: 4, epsKin: 0, eps4: 0, M0: 1, reject: true }, init: { c0: 0.02, theta: 0, nSeeds: 1 } },
+            { label: 'Reference deck', params: { dT: 5, epsKin: 0, eps4: 0.04, M0: 5, reject: false }, init: { c0: 0.02, theta: 0, nSeeds: 1 }, n: 128, tEnd: 2e-3 },
         ],
-        views: ['phase', 'conc', 'kappa', 'vel', 'alpha'],
+        views: ['phase', 'conc', 'orient', 'kappa', 'vel', 'alpha'],
         thermo(P) {
             const { mLiq, Tm, L } = this.fixed;
+            // Liquid cells carry g = 0, so the crystal frame is the solid side's.
+            const frame = (gp, gq) => (gp !== 0 ? gp : gq);
+            const theta = (nx, ny, g) => Math.atan2(-nx * Math.sin(g) + ny * Math.cos(g), nx * Math.cos(g) + ny * Math.sin(g));
             return {
                 soluteRejection: !!P.reject, kPartition: P.k,
                 bulkDG(p, q, c, T) {
@@ -292,33 +299,57 @@ seed      = ${s.seed}
                     if (p === 1 && q === 0) return dG;
                     return 0;
                 },
-                sigma: cubicSigma(P.sigma0, P.eps4),
-                mobility: () => P.M0,
+                sigma: (nx, ny, gp, p, q, c, gq) => (P.eps4 ? P.sigma0 * (1 + P.eps4 * Math.cos(4 * theta(nx, ny, frame(gp, gq)))) : P.sigma0),
+                // Kinetic anisotropy M = M0 (1 + eps_k cos 4 theta_c): a GPK Web option.
+                mobility: (gp, gq, T, nx, ny) => {
+                    if (!P.epsKin || (!nx && !ny)) return P.M0;
+                    return P.M0 * (1 + P.epsKin * Math.cos(4 * theta(nx, ny, frame(gp, gq))));
+                },
             };
         },
         diffusivity: (P) => P.D,
         temperature(P, I) { return this.fixed.Tm + this.fixed.mLiq * I.c0 - P.dT; },
-        setup(sim, P, I) {
+        setup(sim, P, I, rand) {
             sim.c.fill(I.c0);
             sim.T.fill(this.temperature(P, I));
-            const r = I.seedR, cx = sim.Nx >> 1, cy = sim.Ny >> 1;
-            sim.paintDisc(cx, cy, r, 1, 0, I.c0 * P.k);
+            const r = I.seedR;
+            // g = 0 marks liquid, so a 0-degree crystal is stored as a tiny positive angle.
+            const orient = (t) => Math.max(t, 1e-4);
+            sim.paintDisc(sim.Nx >> 1, sim.Ny >> 1, r, 1, orient(I.theta * Math.PI / 180), I.c0 * P.k);
+            for (let n = 1; n < I.nSeeds; n++) {
+                const x = rand.int(0, sim.Nx - 1), y = rand.int(0, sim.Ny - 1);
+                sim.paintDisc(x, y, r, 1, orient(rand() * HALF_PI), I.c0 * P.k);
+            }
         },
         live(sim, P, I) { sim.T.fill(this.temperature(P, I)); },
         seed(sim, x, y, P, rand, I) {
-            sim.paintDisc(x, y, Math.max(2, I.seedR), 1, 0, I.c0 * P.k);
+            sim.paintDisc(x, y, Math.max(2, I.seedR), 1, Math.max(rand() * HALF_PI, 1e-4), I.c0 * P.k);
+            sim.clickSeeded = true;
             return 'Added a seed';
         },
         stats(sim) {
             let cmax = 0;
             for (let i = 0; i < sim.N; i++) if (sim.c[i] > cmax) cmax = sim.c[i];
-            return { fs: sim.phaseVolume(1) / sim.N, cmax };
+            const { Nx, Ny, phi } = sim;
+            let edge = 0;
+            for (let k = 0; k < Nx && !edge; k++) edge = phi[k] === 1 || phi[(Ny - 1) * Nx + k] === 1 ? 1 : 0;
+            for (let k = 0; k < Ny && !edge; k++) edge = phi[k * Nx] === 1 || phi[k * Nx + Nx - 1] === 1 ? 1 : 0;
+            return { fs: sim.phaseVolume(1) / sim.N, cmax, edge };
         },
         chart: { y: 'Solid fraction', series: [{ key: 'fs', label: 'f_s' }] },
         hud: (s) => [`f_s = ${(100 * s.fs).toFixed(1)} %`, `c_max = ${s.cmax.toFixed(4)}`],
-        stop: (s) => s.fs > 0.98,
+        // A single dendrite pauses once, when an arm reaches the edge of the periodic box.
+        stop(s, I, sim) {
+            if (s.fs > 0.98) return true;
+            if (!s.edge || I.nSeeds > 1 || sim.clickSeeded || sim.edgeStopped) return false;
+            sim.edgeStopped = true;
+            return 'The dendrite reached the edge of the periodic box. Press Run to continue.';
+        },
         deck(s, P, I) {
             const { mLiq, Tm, L } = this.fixed;
+            const notes = [];
+            if (P.epsKin) notes.push(`# Kinetic anisotropy eps_k = ${fmtNum(P.epsKin)} is a GPK Web option; the C++ model has\n# isotropic mobility, so this deck grows without it.`);
+            if (I.theta || I.nSeeds > 1) notes.push('# Seed orientation and extra seeds are GPK Web options; the C++ deck has one 0-degree seed.');
             return deckHeader('solidification', s) + `
 [thermo]
 M0     = ${fmtNum(P.M0)}
@@ -330,7 +361,7 @@ k_part = ${fmtNum(P.k)}
 T_melt = ${Tm}
 L      = ${fmtNum(L)}
 solute_rejection = ${P.reject ? 'true' : 'false'}
-
+${notes.length ? notes.join('\n') + '\n' : ''}
 [initial]
 c0           = ${fmtNum(I.c0)}
 undercooling = ${fmtNum(P.dT)}

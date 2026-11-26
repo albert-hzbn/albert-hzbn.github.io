@@ -112,7 +112,7 @@ function startWorker() {
             busy(false);
         } else if (m.type === 'stopped') {
             setRunning(false, false);
-            toast(m.reason === 'end' ? `Reached t = ${fmtTime(app.tEnd)}` : 'The process is complete.');
+            toast(m.reason === 'end' ? `Reached t = ${fmtTime(app.tEnd)}` : m.reason === 'done' ? 'The process is complete.' : m.reason);
         } else if (m.type === 'note') {
             if (m.text) toast(m.text);
         } else if (m.type === 'error') {
@@ -249,6 +249,7 @@ function applyPreset(preset, button) {
     for (const [k, v] of Object.entries(preset.params || {})) { app.params[k] = v; controls.params[k]?.set(v); }
     for (const [k, v] of Object.entries(preset.init || {})) { app.init[k] = v; controls.init[k]?.set(v); }
     if (preset.n) app.n = preset.n; else app.n = app.model.n;
+    app.tEnd = preset.tEnd || app.model.tEnd;
     syncGridControls();
     reset();
     toast(`Preset: ${preset.label}`);
@@ -358,11 +359,11 @@ function cellColors(f) {
     const m = app.model, n = f.n, N = n * n;
     const own = new Float32Array(3 * N), comp = new Float32Array(3 * N);
     const phaseView = app.view === 'phase' || (VIEWS[app.view].iface && PHASE_COLORS[m.id]);
-    const deformed = [0.62, 0.63, 0.66];
-    const zeroIsMatrix = m.id === 'recrystallisation';
+    const pc = PHASE_COLORS[m.id];
+    const deformed = pc ? pc[0] : [0.62, 0.63, 0.66];
+    const zeroIsMatrix = m.id === 'recrystallisation' || m.id === 'solidification';
     const orient = app.view === 'orient';
     const lut = labelColors(f.maxLabel);
-    const pc = PHASE_COLORS[m.id];
     const byLabel = (l) => (phaseView && pc ? pc[Math.min(l, pc.length - 1)] : [lut[3 * l], lut[3 * l + 1], lut[3 * l + 2]]);
     const byCell = (j) => {
         if (zeroIsMatrix && f.phi[j] === 0) return deformed;
