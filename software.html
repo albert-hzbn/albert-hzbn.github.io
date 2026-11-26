@@ -6,20 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Software · Albert Linda</title>
     <!-- seo -->
-    <meta name="description" content="Research software by Albert Linda: AtomForge for building atomic structures, DFT and atomistic workflows, machine learning for materials, and browser tools for structures and phase-field simulation.">
+    <meta name="description" content="Research software by Albert Linda: AtomForge for building atomic structures, DFT and atomistic workflows, GPK for microstructure simulation, machine learning for materials, and browser tools for structures and phase-field simulation.">
     <meta name="author" content="Albert Linda">
     <link rel="canonical" href="https://albertlinda.com/software.html">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Albert Linda">
     <meta property="og:title" content="Software · Albert Linda">
-    <meta property="og:description" content="Research software by Albert Linda: AtomForge for building atomic structures, DFT and atomistic workflows, machine learning for materials, and browser tools for structures and phase-field simulation.">
+    <meta property="og:description" content="Research software by Albert Linda: AtomForge for building atomic structures, DFT and atomistic workflows, GPK for microstructure simulation, machine learning for materials, and browser tools for structures and phase-field simulation.">
     <meta property="og:url" content="https://albertlinda.com/software.html">
     <meta property="og:image" content="https://albertlinda.com/images/work/atomforge-main.jpg">
     <meta property="og:image:alt" content="AtomForge main window with an amorphous silica structure">
     <meta property="og:locale" content="en_GB">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Software · Albert Linda">
-    <meta name="twitter:description" content="Research software by Albert Linda: AtomForge for building atomic structures, DFT and atomistic workflows, machine learning for materials, and browser tools for structures and phase-field simulation.">
+    <meta name="twitter:description" content="Research software by Albert Linda: AtomForge for building atomic structures, DFT and atomistic workflows, GPK for microstructure simulation, machine learning for materials, and browser tools for structures and phase-field simulation.">
     <meta name="twitter:image" content="https://albertlinda.com/images/work/atomforge-main.jpg">
     <script type="application/ld+json">
     {"@context":"https://schema.org","@type":"CollectionPage","name":"Software by Albert Linda","url":"https://albertlinda.com/software.html","author":{"@type":"Person","name":"Albert Linda","url":"https://albertlinda.com/"}}
@@ -110,6 +110,21 @@
                 <a class="name" href="https://github.com/albert-hzbn/convert_SQS" target="_blank"
                     rel="noopener">convert_SQS</a><span class="meta">Python</span>
                 <p>Converts ATAT special quasirandom structures to Quantum ESPRESSO or VASP format.</p>
+            </li>
+        </ul>
+
+        <h2>Microstructure simulation</h2>
+        <ul class="projects" data-reveal-stagger>
+            <li>
+                <a class="name" href="https://github.com/albert-hzbn/GPK" target="_blank" rel="noopener">GPK</a><span
+                    class="meta">C++17 · OpenMP · 2D/3D</span>
+                <p>Gaussian-projected kinetics: a sharp-interface framework for microstructure evolution. Each grid
+                    cell stores an integer grain or phase label; a temporary Gaussian projection near boundaries gives
+                    the normal and curvature, so no diffuse interface is stored. One solver covers isotropic and
+                    anisotropic grain growth, recrystallisation, multiphase precipitation and Ostwald ripening,
+                    dendritic solidification with elastic coupling, and magnetic-material extensions. Output opens
+                    directly in ParaView. With D. Raabe; the method paper is submitted to
+                    <em>npj Computational Materials</em>.</p>
             </li>
         </ul>
 
